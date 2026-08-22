@@ -107,6 +107,20 @@ dsh --profile web --dump-config | grep -A5 searxng
 - **代理**:使用 Node 全局 `fetch`,默认忽略系统代理与代理环境变量——到 SearXNG 的流量始终直连。
 - **SearXNG 返回 403**:说明实例未开启 JSON 输出,见上文环境要求。
 
+## 从 MCP 版 SearXNG 集成迁移
+
+如果你之前是通过 MCP server 接的 SearXNG(比如经 `dsh-mcp-client` 挂载
+[`mcp-searxng`](https://github.com/ihor-sokoliuk/mcp-searxng)),装本插件后建议移除旧接入:
+
+- 否则模型会同时看到**两套重叠的搜索工具**(原生 `web_search` 和
+  `mcp__searxng__searxng_web_search`),外加一堆额外 schema——工具选择有随机性,
+  每个请求多付约 1–2k token,而搜索质量毫无增益(两者打的是同一个实例)。
+- 移除方法:删掉 profile `cordis.patch.yml` 里 `dsh-mcp-client` 的 insert 行
+  (HMR 会立即注销工具),再顺手 `npm uninstall -g mcp-searxng`。
+
+放弃的部分:MCP reader 的 PDF 抽取与章节过滤。原生 `web_fetch` 覆盖普通
+HTML/文本页面;以后真需要读 PDF,把 MCP 行加回来也只需几分钟。
+
 ## 卸载
 
 ```sh

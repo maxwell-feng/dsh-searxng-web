@@ -130,6 +130,24 @@ to keep when overriding.
 - **403 from SearXNG**: JSON output is disabled on the instance — see
   Requirements above.
 
+## Migrating from an MCP-based SearXNG integration
+
+If you previously wired SearXNG through an MCP server (e.g.
+[`mcp-searxng`](https://github.com/ihor-sokoliuk/mcp-searxng) via a
+`dsh-mcp-client` row), remove that integration when you install this plugin:
+
+- The model would otherwise see **two overlapping search tools** (native
+  `web_search` and `mcp__searxng__searxng_web_search`) plus several extra
+  schemas — ambiguous tool selection and ~1–2k tokens of per-request
+  overhead for no search-quality gain (both hit the same instance).
+- To remove: delete the `dsh-mcp-client` insert row from your profile's
+  `cordis.patch.yml` (HMR unregisters the tools immediately) and optionally
+  `npm uninstall -g mcp-searxng`.
+
+What you give up: the MCP reader's PDF extraction and section filtering.
+The native `web_fetch` covers plain HTML/text pages; if you later need PDF
+reading again, re-adding the MCP row takes minutes.
+
 ## Uninstall
 
 ```sh
