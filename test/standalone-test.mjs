@@ -1,5 +1,5 @@
 // Standalone smoke test for @maxwell-feng/dsh-searxng-web (no harness needed).
-import { apply } from "./index.js";
+import { apply } from "../index.js";
 
 const searchProviders = [];
 const fetchProviders = [];
