@@ -17,6 +17,7 @@
 ## 环境要求
 
 - Node.js ≥ 20
+- 已安装 DeepSeek Harness `dsh`(在 `0.1.1-rc.2` 上验证)
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
   ```sh
@@ -25,13 +26,23 @@
 
 ## 安装
 
+### 从 npm 安装(推荐)
+
+```sh
+dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
+```
+
+(把 `web` 换成你的 profile,如 `tui`。)CI 发布的纯 JavaScript 包,带 Sigstore provenance,无需源码构建,也不需要 pnpm `allowBuilds` 授权。
+
+### 从 GitHub 安装
+
 ```sh
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-包内是纯 JavaScript(无构建步骤),不需要 pnpm 构建白名单。
+仓库直接携带入口文件(无构建步骤),同样不需要构建授权。
 
 安装时由自带的补丁层完成三件事:
 
@@ -103,6 +114,18 @@ dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
 ```
 
 会同时移除依赖与 bundle 层,`ctx.web` 回落到基础组合(DeepSeek 搜索、无 fetch provider)。
+
+## 发版流程(维护者)
+
+更新 `package.json` 的 `version` 和 `CHANGELOG.md`,然后:
+
+```sh
+git commit -am "release: vX.Y.Z"
+git tag vX.Y.Z
+git push --follow-tags
+```
+
+GitHub Actions 会先跑测试套件,再通过 OIDC trusted publishing(Sigstore provenance)发布到 npm——与 [`@maxwell-feng/dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr) 同一条流水线。
 
 ## 许可证
 

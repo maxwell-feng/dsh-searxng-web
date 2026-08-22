@@ -24,6 +24,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 20
+- DeepSeek Harness `dsh` installed (verified on `0.1.1-rc.2`)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -33,14 +34,26 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 
 ## Install
 
+### From npm (recommended)
+
+```sh
+dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
+```
+
+(Replace `web` with your profile, e.g. `tui`.) Published as plain JavaScript
+with Sigstore provenance via CI — no source build, no pnpm `allowBuilds`
+allowlist needed.
+
+### From GitHub
+
 ```sh
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-The package ships plain JavaScript (no build step), so no pnpm build
-allowlist is needed.
+The repository ships the entry file directly (no build step), so this also
+needs no build allowlist.
 
 Installing does three things (via the bundled patch layer):
 
@@ -125,6 +138,20 @@ dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
 
 Removes both the dependency and the bundle layer. `ctx.web` falls back to
 the base composition (DeepSeek search, no fetch provider).
+
+## Release process (maintainers)
+
+Bump `version` in `package.json`, add a `CHANGELOG.md` entry, then:
+
+```sh
+git commit -am "release: vX.Y.Z"
+git tag vX.Y.Z
+git push --follow-tags
+```
+
+GitHub Actions runs the standalone test suite and publishes to npm via OIDC
+trusted publishing (Sigstore provenance) — the same pipeline as
+[`@maxwell-feng/dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr).
 
 ## License
 
