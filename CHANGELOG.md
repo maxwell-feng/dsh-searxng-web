@@ -3,6 +3,17 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1] - 2026-08-23
+
+### Changed
+
+- Documentation: npm install is now the recommended method (GitHub install
+  kept as an alternative); requirements note the verified dsh version
+  (`0.1.1-rc.2`); added a maintainer release-process section.
+- CI: publish workflow mirrors `@maxwell-feng/dsh-windows-ocr` — `v*` tags
+  trigger tests + npm publish via OIDC trusted publishing; standalone test
+  suite made fully offline/self-contained.
+
 ## [0.1.0] - 2026-08-23
 
 ### Added
