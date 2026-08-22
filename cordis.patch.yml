@@ -1,0 +1,51 @@
+# searxng-web bundle patch: applied when a profile lists this bundle.
+#
+# Three rows:
+#  1. `searxng-web`   — this plugin: registers the ctx.web search + fetch
+#     providers (ids "searxng-web" / "searxng-web-fetch").
+#  2. `web`           — points ctx.web at those providers. Patch semantics
+#     replace the row's whole `config`, so every base key is restated.
+#  3. `tool-web`      — re-enables the native model-facing web tools
+#     (`fetch: false` is the dsh-base default; without fetch:true the model
+#     never sees web_fetch at all). Restates every base key for the same
+#     reason as above.
+#
+# Users can override any of these in their profile's cordis.patch.yml — the
+# user layer applies after bundle layers ("last write wins per row").
+
+- insert:
+    - id: searxng-web
+      name: '@maxwell-feng/dsh-searxng-web'
+      config:
+        # Base URL of your SearXNG instance. The instance must allow JSON
+        # output (settings.yml → search.formats: [html, json]).
+        baseUrl: 'http://127.0.0.1:8080'
+        # Per-attempt budget for ONE search call, in milliseconds.
+        timeoutMs: 15000
+        # Budget for one web_fetch call, in milliseconds.
+        fetchTimeoutMs: 30000
+        # Cap on characters returned by web_fetch (protects context).
+        fetchMaxChars: 200000
+        # Refuse private/loopback/link-local web_fetch targets (SSRF guard).
+        # Set false only for closed deployments where the model may read
+        # internal hosts deliberately.
+        ssrfGuard: true
+        # SearXNG query defaults forwarded with every search (all optional):
+        search:
+          language: ''
+          safesearch: 0
+          # categories: 'general'      # e.g. 'general', 'news', 'it,science'
+          # engines: ''                # e.g. 'google,bing,ddg'
+          # timeRange: ''              # 'day' | 'week' | 'month' | 'year'
+
+- id: web
+  config:
+    searchProvider: searxng-web
+    fetchProvider: searxng-web-fetch
+
+- id: tool-web
+  config:
+    search: true
+    fetch: true
+    searchTimeoutMs: 60000
+    fetchTimeoutMs: 30000
