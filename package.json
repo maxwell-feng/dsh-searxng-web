@@ -32,6 +32,9 @@
   "engines": {
     "node": ">=20"
   },
+  "scripts": {
+    "test": "node test/standalone-test.mjs"
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
