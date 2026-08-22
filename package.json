@@ -1,11 +1,13 @@
 {
   "name": "@maxwell-feng/dsh-searxng-web",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "dsh plugin: back the native web_search / web_fetch tools with your self-hosted SearXNG instance - keyless, private, no third-party search vendor.",
   "type": "module",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "files": [
-    "index.js",
+    "lib",
+    "src",
+    "tsconfig.json",
     "cordis.patch.yml",
     "README.md",
     "README.zh-CN.md",
@@ -33,7 +35,13 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node test/standalone-test.mjs"
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node test/standalone-test.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.1",
+    "@types/node": "^26.2.0",
+    "typescript": "5.9.3"
   },
   "dsh": {
     "bundle": {

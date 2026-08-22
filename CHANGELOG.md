@@ -3,6 +3,24 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-08-23
+
+### Changed
+
+- **Rewritten in TypeScript** (`src/index.ts` → committed `lib/index.js`).
+  Same runtime behavior; the codebase now has full strict-mode types for the
+  config, the ctx.web provider contracts, and the SearXNG JSON response.
+- Installs still need no build: `lib/` is committed, so npm and git installs
+  load the prebuilt entry directly (no `prepare` script, no pnpm
+  `allowBuilds` entry).
+
+### Added
+
+- `tsconfig.json` (strict, NodeNext) and a `Development` section in both
+  READMEs (`npm run build` / `npm test`).
+- CI compiles the TypeScript source before running the test suite
+  (`npm ci` → `npm test` in both workflows).
+
 ## [0.1.1] - 2026-08-23
 
 ### Changed

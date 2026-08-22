@@ -32,7 +32,7 @@
 dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
 ```
 
-(把 `web` 换成你的 profile,如 `tui`。)CI 发布的纯 JavaScript 包,带 Sigstore provenance,无需源码构建,也不需要 pnpm `allowBuilds` 授权。
+(把 `web` 换成你的 profile,如 `tui`。)CI 发布,带 Sigstore provenance;包内自带预编译的 `lib/`,安装时**无需任何构建**,也不需要 pnpm `allowBuilds` 授权。
 
 ### 从 GitHub 安装
 
@@ -42,7 +42,7 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-仓库直接携带入口文件(无构建步骤),同样不需要构建授权。
+仓库直接提交了编译好的 `lib/`,git 安装同样无需构建步骤或构建授权。
 
 安装时由自带的补丁层完成三件事:
 
@@ -128,6 +128,16 @@ dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
 ```
 
 会同时移除依赖与 bundle 层,`ctx.web` 回落到基础组合(DeepSeek 搜索、无 fetch provider)。
+
+## 本地开发
+
+插件源码为 TypeScript(`src/index.ts`);编译产物 `lib/index.js` 直接提交在仓库里,安装方永远不需要构建。
+
+```sh
+npm install          # 开发依赖(typescript、@types/node、cordis 类型)
+npm run build        # 编译 src/ → lib/
+npm test             # 构建 + 全离线自包含测试(mock SearXNG)
+```
 
 ## 发版流程(维护者)
 

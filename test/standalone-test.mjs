@@ -6,7 +6,7 @@
 
 import http from "node:http";
 import { once } from "node:events";
-import { apply } from "../index.js";
+import { apply } from "../lib/index.js";
 
 /** Minimal JSON-RPC-free helper: start an http server, return its base URL. */
 async function startServer(handler) {

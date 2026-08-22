@@ -40,9 +40,9 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
 ```
 
-(Replace `web` with your profile, e.g. `tui`.) Published as plain JavaScript
-with Sigstore provenance via CI — no source build, no pnpm `allowBuilds`
-allowlist needed.
+(Replace `web` with your profile, e.g. `tui`.) Published from CI with
+Sigstore provenance; the package ships a prebuilt `lib/`, so nothing needs
+to be compiled or allowlisted on install.
 
 ### From GitHub
 
@@ -52,8 +52,8 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-The repository ships the entry file directly (no build step), so this also
-needs no build allowlist.
+The repository commits the compiled `lib/` output, so git installs also load
+without any build step or pnpm `allowBuilds` allowlist.
 
 Installing does three things (via the bundled patch layer):
 
@@ -156,6 +156,17 @@ dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
 
 Removes both the dependency and the bundle layer. `ctx.web` falls back to
 the base composition (DeepSeek search, no fetch provider).
+
+## Development
+
+The plugin is written in TypeScript (`src/index.ts`); the compiled
+`lib/index.js` is committed so installs never need a build.
+
+```sh
+npm install          # dev dependencies (typescript, @types/node, cordis types)
+npm run build        # compile src/ → lib/
+npm test             # build + self-contained offline test suite (mock SearXNG)
+```
 
 ## Release process (maintainers)
 

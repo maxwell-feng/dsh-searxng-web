@@ -18,11 +18,13 @@
 //   `ssrfGuard: false` for closed deployments). Known limitation: the guard
 //   validates the initial URL only — redirects are followed by fetch() and
 //   not re-validated in v1.
-// - No build step: this file IS the published entry (`main: index.js`), so
-//   git installs load without any prepare script or pnpm allowBuilds entry.
+// - TypeScript source lives in src/; the compiled lib/index.js is COMMITTED,
+//   so git installs load without any prepare script or pnpm allowBuilds
+//   entry. Rebuild with `npm run build` after editing the source.
 
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
+import type { Context } from "@deepseek-ai/cordis";
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = "searxng-web";
@@ -34,16 +36,82 @@ const SEARCH_PROVIDER_ID = "searxng-web";
 const FETCH_PROVIDER_ID = "searxng-web-fetch";
 const MAX_RESULTS_CAP = 50;
 
+// ---------------------------------------------------------------------------
+// Public types (structural mirrors of the ctx.web seam contracts).
+// ---------------------------------------------------------------------------
+
+export interface SearchDefaults {
+    language?: string;
+    safesearch?: number | string;
+    categories?: string;
+    engines?: string;
+    timeRange?: string;
+}
+
+export interface SearxngWebConfig {
+    /** SearXNG instance base URL. Default: http://127.0.0.1:8080 */
+    baseUrl?: string;
+    /** Per-search attempt budget, ms. Default 15000. */
+    timeoutMs?: number;
+    /** Per-fetch attempt budget, ms. Default 30000. */
+    fetchTimeoutMs?: number;
+    /** Cap on characters returned by web_fetch. Default 200000. */
+    fetchMaxChars?: number;
+    /** Refuse private/loopback fetch targets. Default true. */
+    ssrfGuard?: boolean;
+    /** SearXNG query defaults forwarded on every search. */
+    search?: SearchDefaults;
+}
+
+export interface Source {
+    url: string;
+    title?: string;
+    snippet?: string;
+    publishedAt?: string;
+}
+
+export interface SearchOutcome {
+    sources: Source[];
+    truncated: boolean;
+    content?: string;
+}
+
+export interface FetchOutcome {
+    url: string;
+    statusCode: number;
+    body: { kind: "text"; content: string };
+    truncated: boolean;
+}
+
+interface WebSearchProvider {
+    id: string;
+    available(): boolean;
+    search(request: { query: string; maxResults?: number }, signal?: AbortSignal): Promise<SearchOutcome>;
+}
+
+interface WebFetchProvider {
+    id: string;
+    available(): boolean;
+    fetch(request: { url: string }, signal?: AbortSignal): Promise<FetchOutcome>;
+}
+
+interface WebService {
+    registerSearchProvider(provider: WebSearchProvider): void;
+    registerFetchProvider(provider: WebFetchProvider): void;
+}
+
+type PluginContext = Context & { web: WebService; logger?: { info?(message: string): void } };
+
 /** Build a classified ProviderError (code mirrors the dsh-web seam codes). */
-function providerError(code, message, status) {
-    const err = new Error(message);
+function providerError(code: string, message: string, status?: number): Error & { code: string; status?: number } {
+    const err = new Error(message) as Error & { code: string; status?: number };
     err.code = code;
     if (status !== undefined) err.status = status;
     return err;
 }
 
-/** Strip scheme-less trailing slashes from the instance base URL. */
-function normalizeBaseUrl(raw) {
+/** Strip trailing slashes from the instance base URL. */
+function normalizeBaseUrl(raw: string): string {
     return raw.replace(/\/+$/, "");
 }
 
@@ -51,28 +119,28 @@ function normalizeBaseUrl(raw) {
 // SSRF guard: classify whether a host resolves to a private/loopback range.
 // ---------------------------------------------------------------------------
 
-function isPrivateIPv4(ip) {
+function isPrivateIPv4(ip: string): boolean {
     const o = ip.split(".").map(Number);
     if (o.length !== 4 || o.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return true;
-    if (o[0] === 0 || o[0] === 10 || o[0] === 127) return true;               // this-network, private, loopback
-    if (o[0] === 169 && o[1] === 254) return true;                            // link-local
-    if (o[0] === 172 && o[1] >= 16 && o[1] <= 31) return true;                // private
-    if (o[0] === 192 && o[1] === 168) return true;                            // private
-    if (o[0] === 100 && o[1] >= 64 && o[1] <= 127) return true;               // CGNAT
+    if (o[0] === 0 || o[0] === 10 || o[0] === 127) return true; // this-network, private, loopback
+    if (o[0] === 169 && o[1] === 254) return true; // link-local
+    if (o[0] === 172 && o[1] >= 16 && o[1] <= 31) return true; // private
+    if (o[0] === 192 && o[1] === 168) return true; // private
+    if (o[0] === 100 && o[1] >= 64 && o[1] <= 127) return true; // CGNAT
     return false;
 }
 
-function isPrivateIPv6(ip) {
+function isPrivateIPv6(ip: string): boolean {
     const lower = ip.toLowerCase();
-    if (lower === "::" || lower === "::1") return true;                       // unspecified, loopback
-    if (lower.startsWith("fe8") || lower.startsWith("fe9") || lower.startsWith("fea") || lower.startsWith("feb")) return true; // link-local fe80::/10
-    if (/^f[cd]/.test(lower)) return true;                                    // unique-local fc00::/7
+    if (lower === "::" || lower === "::1") return true; // unspecified, loopback
+    if (/^fe[89ab]/.test(lower)) return true; // link-local fe80::/10
+    if (/^f[cd]/.test(lower)) return true; // unique-local fc00::/7
     const mapped = /^::ffff:(\d+\.\d+\.\d+\.\d+)$/i.exec(lower);
-    if (mapped) return isPrivateIPv4(mapped[1]);                              // v4-mapped
+    if (mapped) return isPrivateIPv4(mapped[1]); // v4-mapped
     return false;
 }
 
-function isPrivateIp(ip) {
+function isPrivateIp(ip: string): boolean {
     const family = isIP(ip);
     if (family === 4) return isPrivateIPv4(ip);
     if (family === 6) return isPrivateIPv6(ip);
@@ -84,8 +152,8 @@ function isPrivateIp(ip) {
  * error. With the guard on, every address the hostname resolves to must be
  * public; literal IPs are checked directly.
  */
-async function resolveFetchTarget(urlStr, guard) {
-    let url;
+async function resolveFetchTarget(urlStr: string, guard: boolean): Promise<URL> {
+    let url: URL;
     try {
         url = new URL(urlStr);
     } catch {
@@ -96,15 +164,11 @@ async function resolveFetchTarget(urlStr, guard) {
     }
     if (!guard) return url;
     const host = url.hostname.replace(/^\[|\]$/g, "");
-    let addresses;
-    if (isIP(host)) {
-        addresses = [{ address: host }];
-    } else {
-        try {
-            addresses = await lookup(host, { all: true });
-        } catch {
-            throw providerError("network", `cannot resolve host: ${host}`);
-        }
+    let addresses: Array<{ address: string }>;
+    try {
+        addresses = await lookup(host, { all: true });
+    } catch {
+        throw providerError("network", `cannot resolve host: ${host}`);
     }
     if (addresses.some((a) => isPrivateIp(a.address))) {
         throw providerError("bad-request", "refusing private/loopback target (SSRF guard); set ssrfGuard:false to allow");
@@ -117,27 +181,38 @@ async function resolveFetchTarget(urlStr, guard) {
 // ---------------------------------------------------------------------------
 
 /** fetch() under BOTH the caller signal and a hard timeout. */
-async function fetchBounded(url, init, timeoutMs, callerSignal) {
+async function fetchBounded(url: URL | string, init: RequestInit, timeoutMs: number, callerSignal?: AbortSignal): Promise<Response> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(new Error(`timed out after ${timeoutMs}ms`)), timeoutMs);
     timer.unref?.();
     try {
-        return await fetch(url, { ...init, signal: AbortSignal.any([controller.signal, ...(callerSignal ? [callerSignal] : [])]) });
+        return await fetch(url, {
+            ...init,
+            signal: AbortSignal.any([controller.signal, ...(callerSignal ? [callerSignal] : [])]),
+        });
     } catch (error) {
         // Caller cancellation propagates untouched so dsh-web keeps its abort semantics.
         if (callerSignal?.aborted) throw error;
-        const cause = error?.cause ?? error;
+        const cause = (error as { cause?: unknown })?.cause ?? error;
         const detail = cause instanceof Error ? cause.message : String(cause ?? "");
-        throw providerError("network", `request failed (${url.origin}): ${detail || error.message}`);
+        const origin = typeof url === "string" ? url : url.origin;
+        throw providerError("network", `request failed (${origin}): ${detail || (error as Error).message}`);
     } finally {
         clearTimeout(timer);
     }
 }
 
-const ENTITY_MAP = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&nbsp;": " " };
+const ENTITY_MAP: Record<string, string> = {
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&#39;": "'",
+    "&nbsp;": " ",
+};
 
 /** Reduce HTML to readable text: drop script/style/comments/tags, decode entities, squash whitespace. */
-export function htmlToText(html) {
+export function htmlToText(html: string): string {
     return html
         .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
         .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
@@ -151,24 +226,34 @@ export function htmlToText(html) {
         .trim();
 }
 
+interface SearxngResult {
+    url?: unknown;
+    title?: unknown;
+    content?: unknown;
+    publishedDate?: unknown;
+}
+
 // ---------------------------------------------------------------------------
 // Plugin entry.
 // ---------------------------------------------------------------------------
 
-export function apply(ctx, config = {}) {
+export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): void {
     const baseUrl = normalizeBaseUrl(
         typeof config.baseUrl === "string" && config.baseUrl.trim()
             ? config.baseUrl.trim()
             : "http://127.0.0.1:8080",
     );
     const searchTimeoutMs = typeof config.timeoutMs === "number" && config.timeoutMs > 0 ? config.timeoutMs : 15000;
-    const fetchTimeoutMs = typeof config.fetchTimeoutMs === "number" && config.fetchTimeoutMs > 0 ? config.fetchTimeoutMs : 30000;
-    const fetchMaxChars = typeof config.fetchMaxChars === "number" && config.fetchMaxChars > 0 ? config.fetchMaxChars : 200_000;
+    const fetchTimeoutMs =
+        typeof config.fetchTimeoutMs === "number" && config.fetchTimeoutMs > 0 ? config.fetchTimeoutMs : 30000;
+    const fetchMaxChars =
+        typeof config.fetchMaxChars === "number" && config.fetchMaxChars > 0 ? config.fetchMaxChars : 200_000;
     const ssrfGuard = config.ssrfGuard !== false;
-    const defaults = typeof config.search === "object" && config.search !== null ? config.search : {};
+    const defaults: SearchDefaults =
+        typeof config.search === "object" && config.search !== null ? config.search : {};
 
     /** Query the SearXNG JSON API and map to the ctx.web search outcome shape. */
-    async function searxSearch(query, maxResults, signal) {
+    async function searxSearch(query: string, maxResults: number | undefined, signal?: AbortSignal): Promise<SearchOutcome> {
         const url = new URL(`${baseUrl}/search`);
         url.searchParams.set("q", query);
         url.searchParams.set("format", "json");
@@ -178,7 +263,7 @@ export function apply(ctx, config = {}) {
             ["categories", "categories"],
             ["engines", "engines"],
             ["time_range", "timeRange"],
-        ]) {
+        ] as const) {
             const value = defaults[key];
             if (typeof value === "string" && value.trim()) url.searchParams.set(param, value.trim());
         }
@@ -188,33 +273,42 @@ export function apply(ctx, config = {}) {
         const res = await fetchBounded(url, { headers: { accept: "application/json" } }, searchTimeoutMs, signal);
         if (!res.ok) {
             if (res.status === 403) {
-                throw providerError("auth", "SearXNG refused the request (403) — enable JSON output in settings.yml (search.formats: [html, json])", 403);
+                throw providerError(
+                    "auth",
+                    "SearXNG refused the request (403) — enable JSON output in settings.yml (search.formats: [html, json])",
+                    res.status,
+                );
             }
             if (res.status >= 500) throw providerError("server", `SearXNG server error (HTTP ${res.status})`, res.status);
             throw providerError("bad-request", `SearXNG request failed (HTTP ${res.status})`, res.status);
         }
-        const raw = await res.json();
+        const raw = (await res.json()) as { results?: SearxngResult[]; answer?: unknown };
         const results = Array.isArray(raw?.results) ? raw.results : [];
-        const limit = Number.isInteger(maxResults) && maxResults > 0 ? Math.min(maxResults, MAX_RESULTS_CAP) : undefined;
+        const limit =
+            typeof maxResults === "number" && Number.isInteger(maxResults) && maxResults > 0
+                ? Math.min(maxResults, MAX_RESULTS_CAP)
+                : undefined;
         const sources = results
             .slice(0, limit)
-            .map((r) => {
+            .map((r): Source | null => {
                 const u = typeof r?.url === "string" ? r.url : "";
                 if (!u) return null;
-                const s = { url: u };
+                const s: Source = { url: u };
                 if (typeof r.title === "string" && r.title) s.title = r.title;
                 if (typeof r.content === "string" && r.content) s.snippet = r.content;
                 if (typeof r.publishedDate === "string" && r.publishedDate) s.publishedAt = r.publishedDate;
                 return s;
             })
-            .filter((s) => s !== null);
-        const outcome = { sources, truncated: false };
+            .filter((s): s is Source => s !== null);
+        const outcome: SearchOutcome = { sources, truncated: false };
         if (typeof raw?.answer === "string" && raw.answer) outcome.content = raw.answer;
         return outcome;
     }
 
+    const web = (ctx as PluginContext).web;
+
     // ---- ctx.web search provider -------------------------------------------
-    ctx.web.registerSearchProvider({
+    web.registerSearchProvider({
         id: SEARCH_PROVIDER_ID,
         available() {
             return Boolean(baseUrl);
@@ -227,7 +321,7 @@ export function apply(ctx, config = {}) {
     });
 
     // ---- ctx.web fetch provider --------------------------------------------
-    ctx.web.registerFetchProvider({
+    web.registerFetchProvider({
         id: FETCH_PROVIDER_ID,
         available() {
             return Boolean(baseUrl);
@@ -242,7 +336,8 @@ export function apply(ctx, config = {}) {
                 {
                     headers: {
                         // Some sites reject requests without a browser-ish UA.
-                        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
+                        "user-agent":
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36",
                         accept: "text/html,application/xhtml+xml,application/json;q=0.9,text/plain;q=0.8,*/*;q=0.7",
                     },
                     redirect: "follow",
@@ -267,5 +362,5 @@ export function apply(ctx, config = {}) {
         },
     });
 
-    ctx.logger?.info?.(`[searxng-web] providers registered (instance: ${baseUrl})`);
+    (ctx as PluginContext).logger?.info?.(`[searxng-web] providers registered (instance: ${baseUrl})`);
 }
