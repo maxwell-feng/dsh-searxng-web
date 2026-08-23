@@ -3,6 +3,30 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0] - 2026-08-23
+
+### Added
+
+- Instance authentication, for deployments behind an API-key gate or an
+  authenticating reverse proxy (searxng + caddy/nginx):
+  - `headers` — extra HTTP headers attached to SearXNG requests only
+    (e.g. `X-API-Key`).
+  - `basicAuth.username` / `basicAuth.password` — sets the Authorization
+    header for caddy `basic_auth` / nginx `auth_basic` front doors.
+  - Credentials never ride on `web_fetch` requests (model-chosen
+    third-party pages must stay credential-free). Setting both `basicAuth`
+    and a user-supplied `headers.Authorization` fails at load time.
+- A Schemastery `Config` schema per the dsh plugin docs
+  (`docs/user/develop/basic/config`): configuration is now validated at load
+  time with actionable errors; defaults mirror the previous defensive
+  fallbacks, so existing configs behave identically.
+
+### Changed
+
+- The 403 error message now distinguishes "credentials rejected" from "JSON
+  output disabled" when instance credentials are configured.
+- New dependency: `@deepseek-ai/schemastery` (runtime, used by the loader).
+
 ## [0.2.0] - 2026-08-23
 
 ### Changed

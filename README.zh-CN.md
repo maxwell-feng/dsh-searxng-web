@@ -98,6 +98,46 @@ dsh --profile web --dump-config | grep -A5 searxng
 | `search.categories` | *(未设置)* | SearXNG `categories` 参数 |
 | `search.engines` | *(未设置)* | SearXNG `engines` 参数 |
 | `search.timeRange` | *(未设置)* | SearXNG `time_range` 参数 |
+| `headers` | *(未设置)* | 附加到 **SearXNG 请求**的额外 HTTP 头(如 `X-API-Key` 网关)——绝不发送给 `web_fetch` 目标 |
+| `basicAuth.username` / `basicAuth.password` | *(未设置)* | 实例位于带认证的反向代理后时的 Basic 认证凭据(caddy `basic_auth`、nginx `auth_basic`) |
+
+## API Key 与反向代理认证
+
+在实例前面加"门"的三种受支持方式。这里配置的凭据**只**附加到发往你
+SearXNG 实例的请求上;`web_fetch` 的目标页(由模型任选的第三方页面)永远
+不带凭据,防止密钥泄漏。
+
+1. **Header 门**(推荐给 API 调用方):
+
+   ```yaml
+   config:
+     baseUrl: 'http://searx.internal:8080'
+     headers:
+       X-API-Key: 'your-key'
+   ```
+
+   配合 caddy 的 [`forward_auth`](https://caddyserver.com/docs/caddyfile/directives/forward_auth)
+   或自写中间件比对该头即可。
+
+2. **Basic 认证反向代理**(caddy `basic_auth`、nginx `auth_basic`):
+
+   ```yaml
+   config:
+     baseUrl: 'http://searx.internal:8080'
+     basicAuth:
+       username: 'searxng'
+       password: 'hunter2'
+   ```
+
+   同时设置 `basicAuth` 和用户自带的 `headers.Authorization` 会在加载时
+   直接报错,提示二选一。
+
+3. **路径前缀密钥**(零插件配置):如果反向代理在转发前剥掉一段秘密前缀,
+   直接把它写进 `baseUrl` 即可,例如 `baseUrl: 'http://host:8081/s/<KEY>'`。
+   搜索适配器会在你给的 base 后面追加 `/search?...`,所以天然兼容。
+
+> Node 的 `fetch` 拒绝内嵌凭据的 URL(`http://user:pass@…`),这就是认证
+> 放在独立配置字段而不是塞进 `baseUrl` 的原因。
 
 ## 行为说明与限制
 

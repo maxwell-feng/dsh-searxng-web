@@ -30,6 +30,14 @@
         # Set false only for closed deployments where the model may read
         # internal hosts deliberately.
         ssrfGuard: true
+        # Instance authentication (SearXNG requests only; web_fetch targets
+        # never receive credentials). Uncomment ONE mechanism if your
+        # instance sits behind an API-key gate or authenticating proxy:
+        # headers:
+        #   X-API-Key: 'your-key'
+        # basicAuth:
+        #   username: 'searxng'
+        #   password: 'hunter2'
         # SearXNG query defaults forwarded with every search (all optional):
         search:
           language: ''

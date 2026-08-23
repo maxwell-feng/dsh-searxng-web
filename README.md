@@ -113,6 +113,49 @@ to keep when overriding.
 | `search.categories` | *(unset)* | SearXNG `categories` param |
 | `search.engines` | *(unset)* | SearXNG `engines` param |
 | `search.timeRange` | *(unset)* | SearXNG `time_range` param |
+| `headers` | *(unset)* | Extra HTTP headers attached to **SearXNG requests only** (e.g. `X-API-Key` gates) — never sent to `web_fetch` targets |
+| `basicAuth.username` / `basicAuth.password` | *(unset)* | Basic-auth credentials for instances behind an authenticating reverse proxy (caddy `basic_auth`, nginx `auth_basic`) |
+
+## API keys & authenticated reverse proxies
+
+Three supported ways to put a gate in front of the instance. Credentials
+configured here ride **only** on requests to your SearXNG instance;
+`web_fetch` targets (model-chosen third-party pages) always stay
+credential-free.
+
+1. **Header gate** (recommended for API consumers):
+
+   ```yaml
+   config:
+     baseUrl: 'http://searx.internal:8080'
+     headers:
+       X-API-Key: 'your-key'
+   ```
+
+   Pair it with a caddy check, e.g.
+   [`caddy-l4`/`forward_auth`](https://caddyserver.com/docs/caddyfile/directives/forward_auth)
+   or a small middleware that compares the header.
+
+2. **Basic-auth reverse proxy** (caddy `basic_auth`, nginx `auth_basic`):
+
+   ```yaml
+   config:
+     baseUrl: 'http://searx.internal:8080'
+     basicAuth:
+       username: 'searxng'
+       password: 'hunter2'
+   ```
+
+   Setting both `basicAuth` and a user-supplied `headers.Authorization`
+   fails at load time with an actionable error.
+
+3. **Path-prefix key** (no plugin config needed): if your reverse proxy
+   strips a secret prefix before proxying, just include it in `baseUrl`,
+   e.g. `baseUrl: 'http://host:8081/s/<KEY>'`. Works because the search
+   adapter appends `/search?...` to whatever base you give it.
+
+> Node's `fetch` refuses URLs that embed credentials (`http://user:pass@…`),
+> which is why auth lives in dedicated config fields instead of `baseUrl`.
 
 ## Behavior notes & limits
 

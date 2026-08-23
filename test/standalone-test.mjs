@@ -126,6 +126,56 @@ try {
   } catch (e) {
     check("empty query rejected", e.code === "bad-request");
   }
+
+  // 7) instance credentials ride on SearXNG requests only
+  const gated = await startServer((req, res) => {
+    const url = new URL(req.url, "http://x");
+    if (url.pathname === "/search" && url.searchParams.get("format") === "json") {
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({
+        results: [{
+          url: "https://example.com/echoed",
+          title: String(req.headers["x-api-key"] ?? ""),
+          content: String(req.headers["authorization"] ?? ""),
+        }],
+      }));
+      return;
+    }
+    res.statusCode = 500;
+    res.end();
+  });
+  try {
+    const gctx = makeCtx();
+    apply(gctx, {
+      baseUrl: gated.base,
+      ssrfGuard: false,
+      headers: { "X-API-Key": "secret-key" },
+      basicAuth: { username: "searxng", password: "hunter2" },
+    });
+    const out7 = await gctx.providers.search[0].search({ query: "q" }, undefined);
+    check("headers passthrough reaches SearXNG (X-API-Key)", out7.sources[0]?.title === "secret-key");
+    let decoded = "";
+    if (/^Basic /.test(out7.sources[0]?.snippet ?? "")) {
+      decoded = Buffer.from(out7.sources[0].snippet.slice(6), "base64").toString();
+    }
+    check("basicAuth sets Authorization Basic user:pass", decoded === "searxng:hunter2");
+
+    // web_fetch targets are model-chosen pages and must stay credential-free
+    let pageCreds;
+    page.server.on("request", (req) => { pageCreds = [req.headers.authorization, req.headers["x-api-key"]]; });
+    await gctx.providers.fetch[0].fetch({ url: `${page.base}/leak-test` }, undefined);
+    check("web_fetch targets stay credential-free", !pageCreds?.[0] && !pageCreds?.[1], JSON.stringify(pageCreds));
+
+    // a user-supplied Authorization alongside basicAuth fails loudly at load
+    try {
+      apply(makeCtx(), { baseUrl: gated.base, basicAuth: { password: "p" }, headers: { Authorization: "Bearer x" } });
+      check("basicAuth vs headers conflict rejected", false, "no error");
+    } catch (e) {
+      check("basicAuth vs headers conflict rejected", /conflict/.test(e.message));
+    }
+  } finally {
+    gated.server.close();
+  }
 } finally {
   searx.server.close();
   page.server.close();

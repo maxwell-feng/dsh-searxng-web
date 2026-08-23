@@ -7,11 +7,16 @@
 // Design notes:
 // - Function-form plugin per docs/user/develop/basic: exports `name`,
 //   `inject`, and `apply(ctx, config)`. The bundle's cordis.patch.yml inserts
-//   the loader row and carries the config; no schemastery schema is needed
-//   (config fields are read defensively, windows-ocr style).
+//   the loader row and carries the config. A Schemastery `Config` schema
+//   validates user configuration at load time (docs/user/develop/basic/config);
+//   apply() still reads defensively so direct callers (tests) work too.
 // - The search adapter queries the SearXNG JSON API
 //   (GET {baseUrl}/search?format=json). The instance URL is operator
 //   configured and trusted by definition.
+// - Instance credentials (`basicAuth`, `headers`) attach ONLY to requests
+//   bound for the configured SearXNG instance. They are NEVER applied to
+//   web_fetch targets: those URLs are model-chosen third-party pages, and
+//   leaking an API key or proxy password there would hand it to a stranger.
 // - The fetch adapter performs a bounded GET of the requested URL. Because a
 //   fetch provider lets the MODEL choose the request target, an SSRF guard
 //   refuses private/loopback/link-local targets by default (opt out with
@@ -25,6 +30,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import type { Context } from "@deepseek-ai/cordis";
+import Schema from "@deepseek-ai/schemastery";
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = "searxng-web";
@@ -48,6 +54,11 @@ export interface SearchDefaults {
     timeRange?: string;
 }
 
+export interface BasicAuthConfig {
+    username?: string;
+    password?: string;
+}
+
 export interface SearxngWebConfig {
     /** SearXNG instance base URL. Default: http://127.0.0.1:8080 */
     baseUrl?: string;
@@ -59,9 +70,48 @@ export interface SearxngWebConfig {
     fetchMaxChars?: number;
     /** Refuse private/loopback fetch targets. Default true. */
     ssrfGuard?: boolean;
+    /**
+     * Extra HTTP headers attached to every request sent TO the SearXNG
+     * instance (search API calls). Never applied to web_fetch targets —
+     * those are model-chosen third-party pages and must stay credential-free.
+     * Use for header-based gates, e.g. `{ "X-API-Key": "..." }`.
+     */
+    headers?: Record<string, string>;
+    /**
+     * Basic-auth credentials for instances behind an authenticating reverse
+     * proxy (caddy basic_auth, nginx auth_basic). Sets the Authorization
+     * header on SearXNG requests. Conflicts with a user-supplied
+     * `headers.Authorization` fail at load time.
+     */
+    basicAuth?: BasicAuthConfig;
     /** SearXNG query defaults forwarded on every search. */
     search?: SearchDefaults;
 }
+
+/**
+ * Loader-time configuration schema (docs/user/develop/basic/config).
+ * Defaults mirror apply()'s defensive fallbacks so behavior is identical
+ * whether the value comes from the schema or from direct callers.
+ */
+export const Config: Schema<SearxngWebConfig> = Schema.object({
+    baseUrl: Schema.string().default("http://127.0.0.1:8080"),
+    timeoutMs: Schema.number().default(15000),
+    fetchTimeoutMs: Schema.number().default(30000),
+    fetchMaxChars: Schema.number().default(200_000),
+    ssrfGuard: Schema.boolean().default(true),
+    headers: Schema.dict(Schema.string()),
+    basicAuth: Schema.object({
+        username: Schema.string(),
+        password: Schema.string(),
+    }),
+    search: Schema.object({
+        language: Schema.string(),
+        safesearch: Schema.union([Schema.number(), Schema.string()]).default(0),
+        categories: Schema.string(),
+        engines: Schema.string(),
+        timeRange: Schema.string(),
+    }),
+});
 
 export interface Source {
     url: string;
@@ -252,6 +302,35 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
     const defaults: SearchDefaults =
         typeof config.search === "object" && config.search !== null ? config.search : {};
 
+    // Resolve instance credentials (SearXNG-bound requests only — never
+    // web_fetch targets, which are model-chosen third-party pages).
+    const instanceHeaders: Record<string, string> = {};
+    if (typeof config.headers === "object" && config.headers !== null) {
+        for (const [key, value] of Object.entries(config.headers)) {
+            if (typeof key === "string" && key !== "" && typeof value === "string") {
+                instanceHeaders[key] = value;
+            }
+        }
+    }
+    const hasHeader = (name: string) =>
+        Object.keys(instanceHeaders).some((h) => h.toLowerCase() === name.toLowerCase());
+    if (
+        typeof config.basicAuth === "object" &&
+        config.basicAuth !== null &&
+        (typeof config.basicAuth.username === "string" || typeof config.basicAuth.password === "string")
+    ) {
+        if (hasHeader("authorization")) {
+            throw new Error(
+                "[searxng-web] configuration conflict: basicAuth sets Authorization but headers already defines one; keep only one mechanism",
+            );
+        }
+        const token = Buffer.from(
+            `${config.basicAuth.username ?? ""}:${config.basicAuth.password ?? ""}`,
+        ).toString("base64");
+        instanceHeaders.Authorization = `Basic ${token}`;
+    }
+    const hasInstanceCredentials = Object.keys(instanceHeaders).length > 0;
+
     /** Query the SearXNG JSON API and map to the ctx.web search outcome shape. */
     async function searxSearch(query: string, maxResults: number | undefined, signal?: AbortSignal): Promise<SearchOutcome> {
         const url = new URL(`${baseUrl}/search`);
@@ -269,13 +348,20 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
         }
 
         // fetchBounded classifies network/timeout failures and rethrows
-        // caller aborts untouched.
-        const res = await fetchBounded(url, { headers: { accept: "application/json" } }, searchTimeoutMs, signal);
+        // caller aborts untouched. Instance credentials ride along here.
+        const res = await fetchBounded(
+            url,
+            { headers: { accept: "application/json", ...instanceHeaders } },
+            searchTimeoutMs,
+            signal,
+        );
         if (!res.ok) {
             if (res.status === 403) {
                 throw providerError(
                     "auth",
-                    "SearXNG refused the request (403) — enable JSON output in settings.yml (search.formats: [html, json])",
+                    hasInstanceCredentials
+                        ? "SearXNG/proxy refused the request (403) — check basicAuth/headers credentials and that JSON output is enabled (search.formats: [html, json])"
+                        : "SearXNG refused the request (403) — enable JSON output in settings.yml (search.formats: [html, json])",
                     res.status,
                 );
             }
