@@ -44,6 +44,18 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 
 仓库直接提交了编译好的 `lib/`,git 安装同样无需构建步骤或构建授权。
 
+### 升级
+
+```sh
+dsh plugin --profile web add @maxwell-feng/dsh-searxng-web@latest
+# 或走 git,在改动进入 npm 前先行取用:
+dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
+```
+
+0.2.x 的配置无需任何改动——此后新增的字段全部可选,默认值与旧行为一致。
+从 0.3.0 起配置会在加载时校验(Schemastery schema),写错的键会让启动直接
+报出可定位的错误,不再被静默忽略。
+
 安装时由自带的补丁层完成三件事:
 
 1. 插入 `searxng-web` 插件行;

@@ -55,6 +55,19 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 The repository commits the compiled `lib/` output, so git installs also load
 without any build step or pnpm `allowBuilds` allowlist.
 
+### Upgrading
+
+```sh
+dsh plugin --profile web add @maxwell-feng/dsh-searxng-web@latest
+# or from git, to pick up changes before they reach npm:
+dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
+```
+
+0.2.x configurations keep working unchanged — every field added since is
+optional with identical defaults. Since 0.3.0 configuration is validated at
+load time (Schemastery schema), a mistyped key fails the boot with an
+actionable error instead of being silently ignored.
+
 Installing does three things (via the bundled patch layer):
 
 1. inserts the `searxng-web` plugin row;
