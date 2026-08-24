@@ -62,6 +62,18 @@ export interface BasicAuthConfig {
 export interface SearxngWebConfig {
     /** SearXNG instance base URL. Default: http://127.0.0.1:8080 */
     baseUrl?: string;
+    /**
+     * Ordered SearXNG endpoints with automatic failover. When non-empty this
+     * list takes precedence over `baseUrl`. Attempts always start at the last
+     * endpoint that succeeded (sticky) and walk the rest of the list once;
+     * only network-level failures (connection refused / unreachable / timeout /
+     * DNS) trigger a switch — an HTTP answer from any door proves that door is
+     * alive and its status is surfaced as-is without failover.
+     *
+     * Typical triple-stack deployment for a home instance:
+     * `[public-IPv4, public-IPv6, LAN-IPv4]`.
+     */
+    baseUrls?: string[];
     /** Per-search attempt budget, ms. Default 15000. */
     timeoutMs?: number;
     /** Per-fetch attempt budget, ms. Default 30000. */
@@ -95,6 +107,7 @@ export interface SearxngWebConfig {
  */
 export const Config: Schema<SearxngWebConfig> = Schema.object({
     baseUrl: Schema.string().default("http://127.0.0.1:8080"),
+    baseUrls: Schema.array(Schema.string()),
     timeoutMs: Schema.number().default(15000),
     fetchTimeoutMs: Schema.number().default(30000),
     fetchMaxChars: Schema.number().default(200_000),
@@ -293,6 +306,22 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
             ? config.baseUrl.trim()
             : "http://127.0.0.1:8080",
     );
+    // Resolve the effective endpoint list: baseUrls (trimmed, deduped) wins
+    // when non-empty; otherwise fall back to the single baseUrl.
+    const endpoints: string[] = (() => {
+        const list: string[] = [];
+        if (Array.isArray(config.baseUrls)) {
+            for (const item of config.baseUrls) {
+                if (typeof item === "string" && item.trim()) list.push(normalizeBaseUrl(item.trim()));
+            }
+        }
+        const unique = Array.from(new Set(list));
+        return unique.length > 0 ? unique : [baseUrl];
+    })();
+    // Index of the endpoint the next attempt starts from. Updated on every
+    // success so a healthy door is not re-probed after a transient failure
+    // of an earlier entry ("sticky failover").
+    let stickyIndex = 0;
     const searchTimeoutMs = typeof config.timeoutMs === "number" && config.timeoutMs > 0 ? config.timeoutMs : 15000;
     const fetchTimeoutMs =
         typeof config.fetchTimeoutMs === "number" && config.fetchTimeoutMs > 0 ? config.fetchTimeoutMs : 30000;
@@ -331,9 +360,13 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
     }
     const hasInstanceCredentials = Object.keys(instanceHeaders).length > 0;
 
-    /** Query the SearXNG JSON API and map to the ctx.web search outcome shape. */
-    async function searxSearch(query: string, maxResults: number | undefined, signal?: AbortSignal): Promise<SearchOutcome> {
-        const url = new URL(`${baseUrl}/search`);
+    /**
+     * Query ONE endpoint's SearXNG JSON API and map to the ctx.web search
+     * outcome shape. Network failures surface as providerError("network");
+     * HTTP-level problems keep their dedicated codes.
+     */
+    async function searchEndpoint(endpoint: string, query: string, maxResults: number | undefined, signal?: AbortSignal): Promise<SearchOutcome> {
+        const url = new URL(`${endpoint}/search`);
         url.searchParams.set("q", query);
         url.searchParams.set("format", "json");
         url.searchParams.set("safesearch", String(defaults.safesearch ?? 0));
@@ -391,13 +424,39 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
         return outcome;
     }
 
+    /**
+     * Sticky-failover search across `endpoints`. Attempts start at
+     * `stickyIndex` and walk the list exactly once. Only network-level errors
+     * ("network" code from fetchBounded) advance to the next endpoint; HTTP
+     * answers and caller aborts propagate immediately.
+     */
+    async function searxSearch(query: string, maxResults: number | undefined, signal?: AbortSignal): Promise<SearchOutcome> {
+        let lastNetworkError: unknown;
+        for (let attempt = 0; attempt < endpoints.length; attempt++) {
+            const idx = (stickyIndex + attempt) % endpoints.length;
+            try {
+                const outcome = await searchEndpoint(endpoints[idx], query, maxResults, signal);
+                stickyIndex = idx;
+                return outcome;
+            } catch (err) {
+                // Caller cancellation is never a failover signal.
+                if (signal?.aborted) throw err;
+                // A door that ANSWERED (any HTTP status) is alive — surface
+                // its error instead of silently trying other doors.
+                if ((err as { code?: string })?.code !== "network") throw err;
+                lastNetworkError = err;
+            }
+        }
+        throw lastNetworkError ?? providerError("network", "all configured SearXNG endpoints failed");
+    }
+
     const web = (ctx as PluginContext).web;
 
     // ---- ctx.web search provider -------------------------------------------
     web.registerSearchProvider({
         id: SEARCH_PROVIDER_ID,
         available() {
-            return Boolean(baseUrl);
+            return endpoints.length > 0;
         },
         async search(request, signal) {
             const query = typeof request?.query === "string" ? request.query.trim() : "";
@@ -410,7 +469,7 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
     web.registerFetchProvider({
         id: FETCH_PROVIDER_ID,
         available() {
-            return Boolean(baseUrl);
+            return endpoints.length > 0;
         },
         async fetch(request, signal) {
             const targetUrl = typeof request?.url === "string" ? request.url : "";
@@ -448,5 +507,7 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
         },
     });
 
-    (ctx as PluginContext).logger?.info?.(`[searxng-web] providers registered (instance: ${baseUrl})`);
+    (ctx as PluginContext).logger?.info?.(
+        `[searxng-web] providers registered (${endpoints.length} endpoint(s); primary: ${endpoints[0]})`,
+    );
 }

@@ -66,7 +66,8 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 0.2.x configurations keep working unchanged — every field added since is
 optional with identical defaults. Since 0.3.0 configuration is validated at
 load time (Schemastery schema), a mistyped key fails the boot with an
-actionable error instead of being silently ignored.
+actionable error instead of being silently ignored. 0.4.0 adds the optional
+`baseUrls` failover list; single-`baseUrl` setups are unaffected.
 
 Installing does three things (via the bundled patch layer):
 
@@ -112,11 +113,41 @@ bundle layers:
 Patch rows replace config wholesale (no deep merge) — restate keys you want
 to keep when overriding.
 
+### Triple-stack endpoints with automatic failover (0.4.0+)
+
+Home instances often live behind several doors at once — a public IPv4, a
+public IPv6 and a LAN address. `baseUrls` takes an ordered list and fails
+over automatically:
+
+```yaml
+- id: searxng-web
+  config:
+    baseUrls:
+      - 'http://203.0.113.10:8081/s/<KEY>'      # public IPv4
+      - 'http://[2409:8a55:…]:8081/s/<KEY>'     # public IPv6
+      - 'http://192.168.10.144:8081/s/<KEY>'    # LAN (same door, same key)
+    timeoutMs: 15000
+```
+
+Semantics:
+
+- **Sticky**: attempts always start at the last endpoint that succeeded, so a
+  healthy door is never re-probed after an earlier entry had a hiccup.
+- **Fail fast on the wire only**: connection refused / unreachable / timeout /
+  DNS failure advance to the next endpoint. Any HTTP answer (200, 403, 502…)
+  proves that door is alive and its status is surfaced as-is — no silent
+  masking of auth problems.
+- One full pass over the list per call; if every endpoint is unreachable you
+  get a single `network` error.
+- `baseUrls` wins when both it and `baseUrl` are set; `baseUrl` alone keeps
+  working exactly as before.
+
 ## Configuration reference
 
 | Key | Default | Description |
 |---|---|---|
 | `baseUrl` | `http://127.0.0.1:8080` | SearXNG instance URL |
+| `baseUrls` | *(unset)* | Ordered endpoint list with sticky automatic failover (0.4.0+); takes precedence over `baseUrl` when non-empty — see "Triple-stack endpoints" above |
 | `timeoutMs` | `15000` | Per-search attempt budget (ms) |
 | `fetchTimeoutMs` | `30000` | Per-fetch attempt budget (ms) |
 | `fetchMaxChars` | `200000` | Max characters returned by `web_fetch` |

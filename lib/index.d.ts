@@ -18,6 +18,18 @@ export interface BasicAuthConfig {
 export interface SearxngWebConfig {
     /** SearXNG instance base URL. Default: http://127.0.0.1:8080 */
     baseUrl?: string;
+    /**
+     * Ordered SearXNG endpoints with automatic failover. When non-empty this
+     * list takes precedence over `baseUrl`. Attempts always start at the last
+     * endpoint that succeeded (sticky) and walk the rest of the list once;
+     * only network-level failures (connection refused / unreachable / timeout /
+     * DNS) trigger a switch — an HTTP answer from any door proves that door is
+     * alive and its status is surfaced as-is without failover.
+     *
+     * Typical triple-stack deployment for a home instance:
+     * `[public-IPv4, public-IPv6, LAN-IPv4]`.
+     */
+    baseUrls?: string[];
     /** Per-search attempt budget, ms. Default 15000. */
     timeoutMs?: number;
     /** Per-fetch attempt budget, ms. Default 30000. */

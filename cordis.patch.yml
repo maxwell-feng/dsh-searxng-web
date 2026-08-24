@@ -20,6 +20,15 @@
         # Base URL of your SearXNG instance. The instance must allow JSON
         # output (settings.yml → search.formats: [html, json]).
         baseUrl: 'http://127.0.0.1:8080'
+        # OPTIONAL (0.4.0+): ordered endpoints with sticky automatic failover.
+        # When non-empty this list replaces baseUrl. Canonical triple-stack
+        # for a home instance reachable via public IPv4, public IPv6 and LAN:
+        # baseUrls:
+        #   - 'http://203.0.113.10:8081/s/<KEY>'    # public IPv4
+        #   - 'http://[2409:8a55:…]:8081/s/<KEY>'   # public IPv6
+        #   - 'http://192.168.1.10:8081/s/<KEY>'    # LAN
+        # Only network-level failures switch doors; any HTTP answer is
+        # surfaced as-is (see README "Triple-stack endpoints").
         # Per-attempt budget for ONE search call, in milliseconds.
         timeoutMs: 15000
         # Budget for one web_fetch call, in milliseconds.

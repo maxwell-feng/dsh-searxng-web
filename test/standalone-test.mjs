@@ -181,5 +181,88 @@ try {
   page.server.close();
 }
 
+// ---- multi-endpoint sticky failover (v0.4.0) ---------------------------------
+// A closed loopback port yields instant ECONNREFUSED, standing in for an
+// unreachable door without any wall-clock timeout cost.
+async function makeSearx(answer) {
+  let hits = 0;
+  const server = http.createServer((req, res) => {
+    hits++;
+    const url = new URL(req.url, "http://x");
+    if (url.pathname === "/search" && url.searchParams.get("format") === "json") {
+      res.setHeader("content-type", "application/json");
+      res.end(JSON.stringify({ answer, results: [{ url: "https://example.com/x", title: answer }] }));
+      return;
+    }
+    res.statusCode = 404;
+    res.end();
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  return { server, base: `http://127.0.0.1:${server.address().port}`, get hits() { return hits; } };
+}
+
+const deadServer = http.createServer(() => {});
+deadServer.listen(0, "127.0.0.1");
+await once(deadServer, "listening");
+const deadBase = `http://127.0.0.1:${deadServer.address().port}`;
+deadServer.close();
+await once(deadServer, "close");
+
+try {
+  // T1: a network-level failure on the first endpoint falls over to the next.
+  const instB = await makeSearx("from-B");
+  try {
+    const ctxA = makeCtx();
+    apply(ctxA, { baseUrls: [deadBase, instB.base], ssrfGuard: false });
+    const outT1 = await ctxA.providers.search[0].search({ query: "q" }, undefined);
+    check("failover skips unreachable endpoint", outT1.content === "from-B", String(outT1.content));
+
+    // T2: stickiness — after one failover the winner stays primary for later
+    // calls (no round-robin), and is skipped transparently when it dies.
+    const instC = await makeSearx("from-C");
+    try {
+      const ctxS = makeCtx();
+      apply(ctxS, { baseUrls: [deadBase, instC.base, instB.base], ssrfGuard: false });
+      const spS = ctxS.providers.search[0];
+      const bBaseline = instB.hits; // T1 may have pinged B; only the DELTA matters
+      const r1 = await spS.search({ query: "q" }, undefined);
+      const r2 = await spS.search({ query: "q" }, undefined);
+      check(
+        "sticky keeps last-good endpoint",
+        r1.content === "from-C" && r2.content === "from-C" && instB.hits === bBaseline,
+        `r1=${r1.content} r2=${r2.content} B-delta=${instB.hits - bBaseline}`,
+      );
+      instC.server.close();
+      await once(instC.server, "close");
+      const r3 = await spS.search({ query: "q" }, undefined);
+      check("fails over again when sticky endpoint dies", r3.content === "from-B", String(r3.content));
+    } finally {
+      if (instC.server.listening) instC.server.close();
+    }
+
+    // T4: empty baseUrls falls back to the classic single baseUrl.
+    const ctxE = makeCtx();
+    apply(ctxE, { baseUrls: [], baseUrl: instB.base, ssrfGuard: false });
+    const outT4 = await ctxE.providers.search[0].search({ query: "q" }, undefined);
+    check("empty baseUrls falls back to baseUrl", outT4.content === "from-B", String(outT4.content));
+  } finally {
+    instB.server.close();
+  }
+
+  // T3: when every endpoint is unreachable the error stays network-classified.
+  const ctxD = makeCtx();
+  apply(ctxD, { baseUrls: [deadBase, deadBase], ssrfGuard: false });
+  try {
+    await ctxD.providers.search[0].search({ query: "q" }, undefined);
+    check("all-endpoints-dead surfaces network error", false, "no error");
+  } catch (e) {
+    check("all-endpoints-dead surfaces network error", e.code === "network");
+  }
+} catch (err) {
+  failures++;
+  console.log(`FAIL - failover suite crashed: ${err?.message ?? err}`);
+}
+
 console.log(failures === 0 ? "\nAll checks passed." : `\n${failures} check(s) FAILED.`);
 process.exit(failures === 0 ? 0 : 1);

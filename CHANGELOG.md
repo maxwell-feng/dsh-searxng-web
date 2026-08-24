@@ -3,6 +3,29 @@
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0] - 2026-08-24
+
+### Added
+
+- **Multi-endpoint sticky failover** via the new `baseUrls` config field —
+  an ordered endpoint list for instances reachable through several doors at
+  once (public IPv4 + public IPv6 + LAN is the canonical triple-stack):
+  - Attempts start at the last endpoint that succeeded (sticky) and walk the
+    remaining list once per call.
+  - Only network-level failures (connection refused / unreachable / timeout /
+    DNS) advance to the next endpoint; any HTTP answer proves the door is
+    alive and its status is surfaced as-is, so auth problems are never masked.
+  - When every endpoint is unreachable a single `network`-classified error is
+    raised after one full pass.
+  - `baseUrls` takes precedence over `baseUrl` when non-empty; entries are
+    trimmed and de-duplicated. Single-`baseUrl` configurations behave exactly
+    as before.
+
+### Changed
+
+- Provider `available()` now reflects the resolved endpoint list; the load
+  log line reports the endpoint count and primary door.
+
 ## [0.3.0] - 2026-08-23
 
 ### Added
