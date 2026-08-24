@@ -2,6 +2,8 @@
 
 [English](README.md) | 简体中文
 
+[![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
+
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 插件:让**原生 `web_search` / `web_fetch` 工具**直接走你自托管的 [SearXNG](https://docs.searxng.org) 实例——免 API Key、数据不出内网、不依赖任何第三方搜索服务商。
 
 ```
