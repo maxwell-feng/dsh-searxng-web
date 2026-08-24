@@ -4,7 +4,7 @@ English | [简体中文](README.zh-CN.md)
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 
-A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin
+[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin
 that backs the **native `web_search` / `web_fetch` tools** with your own
 self-hosted [SearXNG](https://docs.searxng.org) instance — keyless, private,
 no third-party search vendor.
