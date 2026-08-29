@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0] - 2026-08-29
+
+### Compatibility
+
+- **Adapted to deepseek-harness `0.1.2-alpha.1` (master)**: the `ctx.web`
+  seam (`registerSearchProvider` / `registerFetchProvider`) and the `web` /
+  `tool-web` config rows are unchanged from `0.4.0` — provider registration
+  now returns fiber-scoped disposers, which the plugin's registrations rely
+  on as before.
+- `web_fetch` now reports the final URL after redirects (`Response.url`) in
+  the result's `url` field, matching the current `dsh-web` seam contract
+  ("the final URL after allowed redirects").
+- `@deepseek-ai/cordis` stays `4.0.1`.
+
 All notable changes to this project are documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 

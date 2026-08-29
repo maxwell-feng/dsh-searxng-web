@@ -159,8 +159,8 @@ interface WebFetchProvider {
 }
 
 interface WebService {
-    registerSearchProvider(provider: WebSearchProvider): void;
-    registerFetchProvider(provider: WebFetchProvider): void;
+    registerSearchProvider(provider: WebSearchProvider): () => void;
+    registerFetchProvider(provider: WebFetchProvider): () => void;
 }
 
 type PluginContext = Context & { web: WebService; logger?: { info?(message: string): void } };
@@ -499,7 +499,7 @@ export function apply(ctx: Context, config: Partial<SearxngWebConfig> = {}): voi
             const text = /html/i.test(contentType) ? htmlToText(rawBody) : rawBody;
             const truncated = text.length > fetchMaxChars;
             return {
-                url: targetUrl,
+                url: res.url || targetUrl,
                 statusCode: res.status,
                 body: { kind: "text", content: truncated ? text.slice(0, fetchMaxChars) : text },
                 truncated,
