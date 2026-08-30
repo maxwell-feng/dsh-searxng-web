@@ -1,10 +1,10 @@
-# @maxwell-feng/dsh-searxng-web
+# dsh-searxng-web
 
 [English](README.md) | 简体中文
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
-[![npm version](https://img.shields.io/npm/v/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
-[![npm downloads](https://img.shields.io/npm/dm/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![npm version](https://img.shields.io/npm/v/dsh-searxng-web)](https://www.npmjs.com/package/dsh-searxng-web)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-searxng-web)](https://www.npmjs.com/package/dsh-searxng-web)
 [![CI](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml)
 [![Publish](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml)
 [![License](https://img.shields.io/github/license/maxwell-feng/dsh-searxng-web)](LICENSE)
@@ -36,7 +36,7 @@
 ### 从 npm 安装(推荐)
 
 ```sh
-dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
+dsh plugin --profile web add dsh-searxng-web
 ```
 
 (把 `web` 换成你的 profile,如 `tui`。)CI 发布,带 Sigstore provenance;包内自带预编译的 `lib/`,安装时**无需任何构建**,也不需要 pnpm `allowBuilds` 授权。
@@ -54,7 +54,7 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ### 升级
 
 ```sh
-dsh plugin --profile web add @maxwell-feng/dsh-searxng-web@latest
+dsh plugin --profile web add dsh-searxng-web@latest
 # 或走 git,在改动进入 npm 前先行取用:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 ```
@@ -213,7 +213,7 @@ HTML/文本页面;以后真需要读 PDF,把 MCP 行加回来也只需几分钟�
 ## 卸载
 
 ```sh
-dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
+dsh plugin --profile web remove dsh-searxng-web
 ```
 
 会同时移除依赖与 bundle 层,`ctx.web` 回落到基础组合(DeepSeek 搜索、无 fetch provider)。
@@ -238,7 +238,7 @@ git tag vX.Y.Z
 git push --follow-tags
 ```
 
-GitHub Actions 会先跑测试套件,再通过 OIDC trusted publishing(Sigstore provenance)发布到 npm——与 [`@maxwell-feng/dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr) 同一条流水线。
+GitHub Actions 会先跑测试套件,再通过 OIDC trusted publishing(Sigstore provenance)发布到 npm——与 [`dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr) 同一条流水线。
 
 ## 许可证
 

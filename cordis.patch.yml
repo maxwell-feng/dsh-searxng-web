@@ -15,7 +15,7 @@
 
 - insert:
     - id: searxng-web
-      name: '@maxwell-feng/dsh-searxng-web'
+      name: dsh-searxng-web
       config:
         # Base URL of your SearXNG instance. The instance must allow JSON
         # output (settings.yml → search.formats: [html, json]).

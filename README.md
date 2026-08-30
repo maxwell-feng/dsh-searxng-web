@@ -1,10 +1,10 @@
-# @maxwell-feng/dsh-searxng-web
+# dsh-searxng-web
 
 English | [简体中文](README.zh-CN.md)
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
-[![npm version](https://img.shields.io/npm/v/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
-[![npm downloads](https://img.shields.io/npm/dm/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![npm version](https://img.shields.io/npm/v/dsh-searxng-web)](https://www.npmjs.com/package/dsh-searxng-web)
+[![npm downloads](https://img.shields.io/npm/dm/dsh-searxng-web)](https://www.npmjs.com/package/dsh-searxng-web)
 [![CI](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml)
 [![Publish](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml)
 [![License](https://img.shields.io/github/license/maxwell-feng/dsh-searxng-web)](LICENSE)
@@ -44,7 +44,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ### From npm (recommended)
 
 ```sh
-dsh plugin --profile web add @maxwell-feng/dsh-searxng-web
+dsh plugin --profile web add dsh-searxng-web
 ```
 
 (Replace `web` with your profile, e.g. `tui`.) Published from CI with
@@ -65,7 +65,7 @@ without any build step or pnpm `allowBuilds` allowlist.
 ### Upgrading
 
 ```sh
-dsh plugin --profile web add @maxwell-feng/dsh-searxng-web@latest
+dsh plugin --profile web add dsh-searxng-web@latest
 # or from git, to pick up changes before they reach npm:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 ```
@@ -247,7 +247,7 @@ reading again, re-adding the MCP row takes minutes.
 ## Uninstall
 
 ```sh
-dsh plugin --profile web remove @maxwell-feng/dsh-searxng-web
+dsh plugin --profile web remove dsh-searxng-web
 ```
 
 Removes both the dependency and the bundle layer. `ctx.web` falls back to
@@ -276,7 +276,7 @@ git push --follow-tags
 
 GitHub Actions runs the standalone test suite and publishes to npm via OIDC
 trusted publishing (Sigstore provenance) — the same pipeline as
-[`@maxwell-feng/dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr).
+[`dsh-windows-ocr`](https://github.com/maxwell-feng/dsh-windows-ocr).
 
 ## License
 

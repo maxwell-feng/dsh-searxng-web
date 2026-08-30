@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1] - 2026-08-30
+
+### Changed
+
+- **npm package renamed: dropped the `@maxwell-feng/` scope.** The package is
+  now published as **`dsh-searxng-web`** (aligned with the unscoped
+  `dsh-tinyfish-search` convention). All install commands, badges and docs
+  use the new name; the old `@maxwell-feng/dsh-searxng-web` package is
+  deprecated. No code, config or behavior changes — the bundle layer,
+  provider ids (`searxng-web` / `searxng-web-fetch`) and install steps are
+  identical apart from the name.
+
 ## [0.5.0] - 2026-08-29
 
 ### Compatibility
