@@ -3,6 +3,11 @@
 English | [简体中文](README.zh-CN.md)
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
+[![npm version](https://img.shields.io/npm/v/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![npm downloads](https://img.shields.io/npm/dm/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![CI](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml)
+[![Publish](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml)
+[![License](https://img.shields.io/github/license/maxwell-feng/dsh-searxng-web)](LICENSE)
 
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin
 that backs the **native `web_search` / `web_fetch` tools** with your own
@@ -26,7 +31,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 20
-- DeepSeek Harness `dsh` installed (verified on `0.1.1-rc.2`)
+- DeepSeek Harness `dsh` installed (verified on `0.1.2-alpha.1`)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -69,7 +74,9 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 optional with identical defaults. Since 0.3.0 configuration is validated at
 load time (Schemastery schema), a mistyped key fails the boot with an
 actionable error instead of being silently ignored. 0.4.0 adds the optional
-`baseUrls` failover list; single-`baseUrl` setups are unaffected.
+`baseUrls` failover list; single-`baseUrl` setups are unaffected. 0.5.0
+adapts to deepseek-harness `0.1.2-alpha.1` (fiber-scoped provider
+disposers, post-redirect `url` reporting) — no config changes required.
 
 Installing does three things (via the bundled patch layer):
 

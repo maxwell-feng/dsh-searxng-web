@@ -3,6 +3,11 @@
 [English](README.md) | 简体中文
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
+[![npm version](https://img.shields.io/npm/v/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![npm downloads](https://img.shields.io/npm/dm/@maxwell-feng/dsh-searxng-web)](https://www.npmjs.com/package/@maxwell-feng/dsh-searxng-web)
+[![CI](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/ci.yml)
+[![Publish](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml/badge.svg)](https://github.com/maxwell-feng/dsh-searxng-web/actions/workflows/publish.yml)
+[![License](https://img.shields.io/github/license/maxwell-feng/dsh-searxng-web)](LICENSE)
 
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 插件:让**原生 `web_search` / `web_fetch` 工具**直接走你自托管的 [SearXNG](https://docs.searxng.org) 实例——免 API Key、数据不出内网、不依赖任何第三方搜索服务商。
 
@@ -19,7 +24,7 @@
 ## 环境要求
 
 - Node.js ≥ 20
-- 已安装 DeepSeek Harness `dsh`(在 `0.1.1-rc.2` 上验证)
+- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.1` 上验证)
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
   ```sh
@@ -57,7 +62,9 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 0.2.x 的配置无需任何改动——此后新增的字段全部可选,默认值与旧行为一致。
 从 0.3.0 起配置会在加载时校验(Schemastery schema),写错的键会让启动直接
 报出可定位的错误,不再被静默忽略。0.4.0 新增可选的 `baseUrls` 故障转移
-列表;单 `baseUrl` 用法完全不受影响。
+列表;单 `baseUrl` 用法完全不受影响。0.5.0 适配 deepseek-harness
+`0.1.2-alpha.1`(provider 注册改为 fiber 作用域 disposer、重定向后 `url`
+回传)——无需改动任何配置。
 
 安装时由自带的补丁层完成三件事:
 
