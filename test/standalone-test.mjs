@@ -1,4 +1,4 @@
-// Standalone smoke test for @maxwell-feng/dsh-searxng-web.
+// Standalone smoke test for dsh-searxng-web.
 //
 // Fully self-contained like the dsh-windows-ocr suite: a mock SearXNG
 // instance and a mock page server are started in-process, so no LAN
