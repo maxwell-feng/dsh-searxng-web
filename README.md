@@ -51,16 +51,19 @@ dsh plugin --profile web add dsh-searxng-web
 Sigstore provenance; the package ships a prebuilt `lib/`, so nothing needs
 to be compiled or allowlisted on install.
 
-### From GitHub
+or from the repository / a tarball:
 
 ```sh
+dsh plugin --profile web add ./dsh-searxng-web        # source checkout
+dsh plugin --profile web add ./dsh-searxng-web-0.5.2.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-The repository commits the compiled `lib/` output, so git installs also load
-without any build step or pnpm `allowBuilds` allowlist.
+> Git installs fetch sources: the repository commits the compiled `lib/`
+> output, so git installs load without any build step — there is no `prepare`
+> script, so pnpm `allowBuilds` is never needed either.
 
 ### Upgrading
 

@@ -33,23 +33,26 @@
 
 ## 安装
 
-### 从 npm 安装(推荐)
+### 从 npm 安装（推荐）
 
 ```sh
 dsh plugin --profile web add dsh-searxng-web
 ```
 
-(把 `web` 换成你的 profile,如 `tui`。)CI 发布,带 Sigstore provenance;包内自带预编译的 `lib/`,安装时**无需任何构建**,也不需要 pnpm `allowBuilds` 授权。
+（把 `web` 换成你的 profile，如 `tui`。）CI 发布，带 Sigstore provenance；包内自带预编译的 `lib/`，安装时**无需任何构建**，也不需要 pnpm `allowBuilds` 授权。
 
-### 从 GitHub 安装
+或者从仓库 / tarball 安装：
 
 ```sh
+dsh plugin --profile web add ./dsh-searxng-web        # 源码目录
+dsh plugin --profile web add ./dsh-searxng-web-0.5.2.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-仓库直接提交了编译好的 `lib/`,git 安装同样无需构建步骤或构建授权。
+> Git 安装拿到的是源码：仓库直接提交了编译好的 `lib/`，git 安装无需任何
+> 构建步骤——包没有 `prepare` 脚本，因此也不需要 pnpm `allowBuilds` 授权。
 
 ### 升级
 

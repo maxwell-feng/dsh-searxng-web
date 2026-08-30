@@ -1,2 +1,4 @@
 node_modules/
 *.log
+# npm cache written with a literal %APPDATA% path when the env var is unset
+%APPDATA%/

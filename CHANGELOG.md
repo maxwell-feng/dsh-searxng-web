@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.2] - 2026-08-30
+
+### Changed
+
+- README: install section aligned with the `dsh-tinyfish-search` layout —
+  `dsh plugin add` plus repository / tarball / `github:` alternatives
+  (README.md and README.zh-CN.md).
+
 ## [0.5.1] - 2026-08-30
 
 ### Changed
