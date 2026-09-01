@@ -24,7 +24,7 @@
 ## 环境要求
 
 - Node.js ≥ 20
-- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.3` 上验证)
+- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.4` 最新 `master` 上验证；`0.1.2-alpha.3` → `0.1.2-alpha.4` 无缝接口变更)
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
   ```sh
@@ -45,7 +45,7 @@ dsh plugin --profile web add dsh-searxng-web
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # 源码目录
-dsh plugin --profile web add ./dsh-searxng-web-0.5.2.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.5.5.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -69,7 +69,7 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 `0.1.2-alpha.1`(provider 注册改为 fiber 作用域 disposer、重定向后 `url`
 回传)——无需改动任何配置。0.5.3 适配 deepseek-harness `0.1.2-alpha.2`
 ——缝与配置行均无变化,仅依赖版本上移。0.5.4 适配 deepseek-harness
-`0.1.2-alpha.3`——该版本 `packages/web` 仅移动版本号,因此同样无需改动任何配置。
+`0.1.2-alpha.3`——该版本 `packages/web` 仅移动版本号,因此同样无需改动任何配置。0.5.5 在 `0.1.2-alpha.4` 最新 `master` 上验证：缝接口无变更，无需迁移。
 
 安装时由自带的补丁层完成三件事:
 
@@ -83,11 +83,21 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 dsh --profile web
 ```
 
-新会话里直接说"搜 xxx"即可,流量全部走你的实例。随时可以检查组合结果:
+## 使用
+
+新会话直接说“搜 xxx”即可——无需改动工具名：
+
+- `web_search` → `ctx.web` → `searxng-web` → 你的 SearXNG → 已配置的搜索引擎
+- `web_fetch` → `ctx.web` → `searxng-web-fetch` → 目标页面（SSRF 防护，HTML→纯文本）
+
+随时检查组合结果:
 
 ```sh
 dsh --profile web --dump-config | grep -A5 searxng
+# 或在会话里调用 web_search "test" 检查 sources[].url
 ```
+
+GUI：**设置 → 网页搜索** 显示 provider 就绪状态。
 
 ### 指向你的实例
 
