@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.5] - 2026-09-02
+
+### Changed / 变更
+
+- **Compatibility: verified against deepseek-harness `0.1.2-alpha.4` (latest `master`).** Seam (`ctx.web` search/fetch provider registry, `web` / `tool-web` rows, Schemastery config, SSRF guard, HTML→text, sticky `baseUrls` failover) unchanged since `0.1.2-alpha.3` — no code or config migration required. Bumped install tarball reference to `0.5.5` and completed bilingual six-section coverage (Release / Changelog / Install / Uninstall / Usage / Config — bilingual). **/ 兼容性：已在 deepseek-harness `0.1.2-alpha.4` 最新 `master` 上验证。** 缝接口（`ctx.web` 搜索/抓取注册、`web` / `tool-web` 行、Schemastery 配置、SSRF 防护、HTML→文本、粘性 `baseUrls` 故障转移）自 `0.1.2-alpha.3` 以来未变，无需代码或配置迁移。安装包引用升级至 `0.5.5`，并补齐双语六项覆盖（发行版 / 更新说明 / 安装 / 卸载 / 使用 / 配置——双语）。
+
 ## [0.5.4] - 2026-09-01
 
 ### Changed / 变更

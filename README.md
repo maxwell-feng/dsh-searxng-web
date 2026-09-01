@@ -31,7 +31,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 20
-- DeepSeek Harness `dsh` installed (verified on `0.1.2-alpha.3`)
+- DeepSeek Harness `dsh` installed (verified on `0.1.2-alpha.4`, latest `master`; `0.1.2-alpha.3` → `0.1.2-alpha.4` no seam changes)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -55,7 +55,7 @@ or from the repository / a tarball:
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # source checkout
-dsh plugin --profile web add ./dsh-searxng-web-0.5.2.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.5.5.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -84,6 +84,8 @@ disposers, post-redirect `url` reporting) — no config changes required.
 rows are unchanged, only the dependency pins move.
 0.5.4 adapts to deepseek-harness `0.1.2-alpha.3` — `packages/web` moved
 only its version pins in that release, so again no config changes required.
+0.5.5 verifies against `0.1.2-alpha.4` (latest `master`): seam unchanged,
+no config migration.
 
 Installing does three things (via the bundled patch layer):
 
@@ -97,12 +99,21 @@ Then boot as usual:
 dsh --profile web
 ```
 
-New sessions now answer "search xxx" through your instance. Verify in the
-compose output any time:
+## Usage
+
+New sessions now answer "search xxx" through your instance — no tool-name changes:
+
+- `web_search` → `ctx.web` → `searxng-web` → your SearXNG → configured engines
+- `web_fetch` → `ctx.web` → `searxng-web-fetch` → target page (SSRF-guarded, HTML→text)
+
+Verify any time:
 
 ```sh
 dsh --profile web --dump-config | grep -A5 searxng
+# or inside a session: call web_search "test" and inspect sources[].url
 ```
+
+GUI: **Settings → Web Search** shows provider readiness.
 
 ### Pointing at your instance
 
