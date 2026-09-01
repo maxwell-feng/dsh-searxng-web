@@ -24,7 +24,7 @@
 ## 环境要求
 
 - Node.js ≥ 20
-- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.2` 上验证)
+- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.3` 上验证)
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
   ```sh
@@ -68,7 +68,8 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 列表;单 `baseUrl` 用法完全不受影响。0.5.0 适配 deepseek-harness
 `0.1.2-alpha.1`(provider 注册改为 fiber 作用域 disposer、重定向后 `url`
 回传)——无需改动任何配置。0.5.3 适配 deepseek-harness `0.1.2-alpha.2`
-——缝与配置行均无变化,仅依赖版本上移。
+——缝与配置行均无变化,仅依赖版本上移。0.5.4 适配 deepseek-harness
+`0.1.2-alpha.3`——该版本 `packages/web` 仅移动版本号,因此同样无需改动任何配置。
 
 安装时由自带的补丁层完成三件事:
 

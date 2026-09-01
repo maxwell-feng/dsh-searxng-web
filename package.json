@@ -1,6 +1,6 @@
 {
   "name": "dsh-searxng-web",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "dsh plugin: back the native web_search / web_fetch tools with your self-hosted SearXNG instance - keyless, private, no third-party search vendor.",
   "type": "module",
   "main": "./lib/index.js",
@@ -44,7 +44,7 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.1"
+    "@deepseek-ai/schemastery": "^3.18.2"
   },
   "dsh": {
     "bundle": {

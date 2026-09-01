@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.4] - 2026-09-01
+
+### Changed / 变更
+
+- **Adapted to deepseek-harness `0.1.2-alpha.3` (master).** Between
+  `0.1.2-alpha.2` and `0.1.2-alpha.3` the `ctx.web` seam
+  (`registerSearchProvider` / `registerFetchProvider`), the `web` /
+  `tool-web` config rows, and the provider contracts are unchanged —
+  `packages/web` moved only its version pins in that release — so no plugin
+  code changes were required. `@deepseek-ai/cordis` stays at `4.0.2` and
+  `@deepseek-ai/schemastery` moves to `^3.18.2` (the revision the alpha.3
+  checkout builds against); the committed `lib/index.js` is rebuilt and the
+  full test suite passes against the new package set.
+- **适配 deepseek-harness `0.1.2-alpha.3`（master）。** 从 `0.1.2-alpha.2`
+  到 `0.1.2-alpha.3`，`ctx.web` 缝（`registerSearchProvider` /
+  `registerFetchProvider`）、`web` / `tool-web` 配置行以及 provider 契约均
+  未变化——该版本 `packages/web` 仅移动版本号——因此无需改动插件代码。
+  `@deepseek-ai/cordis` 保持 `4.0.2`，`@deepseek-ai/schemastery` 升至
+  `^3.18.2`（alpha.3 检出所依赖的 revision）；重新构建了随包提交的
+  `lib/index.js`，全部测试在新区间依赖下通过。
+
 ## [0.5.3] - 2026-08-31
 
 ### Changed / 变更

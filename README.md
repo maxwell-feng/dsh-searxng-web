@@ -31,7 +31,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 20
-- DeepSeek Harness `dsh` installed (verified on `0.1.2-alpha.2`)
+- DeepSeek Harness `dsh` installed (verified on `0.1.2-alpha.3`)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -82,6 +82,8 @@ adapts to deepseek-harness `0.1.2-alpha.1` (fiber-scoped provider
 disposers, post-redirect `url` reporting) — no config changes required.
 0.5.3 adapts to deepseek-harness `0.1.2-alpha.2` — the seam and config
 rows are unchanged, only the dependency pins move.
+0.5.4 adapts to deepseek-harness `0.1.2-alpha.3` — `packages/web` moved
+only its version pins in that release, so again no config changes required.
 
 Installing does three things (via the bundled patch layer):
 
