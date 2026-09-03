@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.7] - 2026-09-03
+
+### Changed / 变更
+
+- **Compatibility: verified against deepseek-harness `0.1.2-rc.1` (latest `master`).** The seam (`ctx.web` search/fetch provider registry, `web` / `tool-web` rows, Schemastery config, SSRF guard, HTML→text, sticky `baseUrls` failover) is unchanged since `0.1.2-alpha.5`, and the vendored `@deepseek-ai/cordis` `4.0.2` / loader patch mechanism are unchanged — no code or config migration required. README/README.zh-CN requirements updated to `0.1.2-rc.1`; tests ALL PASS. **/ 兼容性：已在 deepseek-harness `0.1.2-rc.1` 最新 `master` 上验证。** 缝接口（`ctx.web` 搜索/抓取注册、`web` / `tool-web` 行、Schemastery 配置、SSRF 防护、HTML→文本、粘性 `baseUrls` 故障转移）自 `0.1.2-alpha.5` 以来未变，内置 `@deepseek-ai/cordis` `4.0.2` / loader 补丁机制亦未变化，无需代码或配置迁移。README/README.zh-CN 环境要求已更新为 `0.1.2-rc.1`；测试全部通过。
+
 ## [0.5.6] - 2026-09-02
 
 ### Changed / 变更
