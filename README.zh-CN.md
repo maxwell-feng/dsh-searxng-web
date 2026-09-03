@@ -24,7 +24,7 @@
 ## 环境要求
 
 - Node.js ≥ 20
-- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-alpha.5` 最新 `master` 上验证；`0.1.2-alpha.4` → `0.1.2-alpha.5` 无缝接口变更)
+- 已安装 DeepSeek Harness `dsh`(在 `0.1.2-rc.1` 最新 `master` 上验证；`0.1.2-alpha.4` → `0.1.2-rc.1` 无缝接口变更)
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
   ```sh
