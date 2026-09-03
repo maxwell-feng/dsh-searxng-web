@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.8] - 2026-09-03
+
+### Fixed / 修复
+
+- **Fix: the `tool-web` re-enable row now clears `disabled` explicitly (`disabled: false`).** The loader's id-patch merge is **per-key**: a config-only row restates `config` but leaves the `disabled: true` shipped by the `@deepseek-ai/dsh-web-app` bundle in place, so on a clean install into a web profile the model never saw `web_search` / `web_fetch` even though this bundle has restated the row since 0.4.0. Verified with `dsh --profile web --dump-config`: the composed `tool-web` row now carries `disabled: false` and both tools mount. / **修复：`tool-web` 重启用行现在显式清除 `disabled`（`disabled: false`）。** loader 的按 id 补丁合并是**按键生效**的：仅带 `config` 的行会重述配置但保留 `@deepseek-ai/dsh-web-app` bundle 自带的 `disabled: true`，因此干净安装到 web profile 后，即使本 bundle 自 0.4.0 起就重述了该行，模型也看不到 `web_search` / `web_fetch`。已用 `dsh --profile web --dump-config` 验证：组合后的 `tool-web` 行现为 `disabled: false`，两个工具正常挂载。
+
 ## [0.5.7] - 2026-09-03
 
 ### Changed / 变更
