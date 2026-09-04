@@ -1,6 +1,6 @@
 {
   "name": "dsh-searxng-web",
-  "version": "0.5.8",
+  "version": "0.5.9",
   "description": "dsh plugin: back the native web_search / web_fetch tools with your self-hosted SearXNG instance - keyless, private, no third-party search vendor.",
   "type": "module",
   "main": "./lib/index.js",

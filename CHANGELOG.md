@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.9] - 2026-09-04
+
+### Changed / 变更
+
+- **Compatibility: verified against deepseek-harness `0.1.3-alpha.1` (latest release).** The seam (`ctx.web` search/fetch provider registry, `web` / `tool-web` rows, Schemastery config, SSRF guard, HTML→text, sticky `baseUrls` failover) is source-identical since `0.1.2-rc.1`, and the vendored `@deepseek-ai/cordis` `4.0.2` / loader patch mechanism are unchanged — no code or config migration required. 0.1.3's headline changes (environment-proxy support, Session persistence rework, file attachments) do not touch any seam this bundle consumes. README/README.zh-CN requirements updated to `0.1.3-alpha.1`; tests all pass. **/ 兼容性：已在 deepseek-harness `0.1.3-alpha.1` 最新发行版上验证。** 缝接口（`ctx.web` 搜索/抓取注册、`web` / `tool-web` 行、Schemastery 配置、SSRF 防护、HTML→文本、粘性 `baseUrls` 故障转移）自 `0.1.2-rc.1` 以来源码完全一致，内置 `@deepseek-ai/cordis` `4.0.2` / loader 补丁机制亦未变化，无需代码或配置迁移。0.1.3 的主要变更（环境代理支持、Session 持久化重构、文件附件）均不涉及本 bundle 消费的任何缝。README/README.zh-CN 环境要求已更新为 `0.1.3-alpha.1`；测试全部通过。
+
 ## [0.5.8] - 2026-09-03
 
 ### Fixed / 修复
