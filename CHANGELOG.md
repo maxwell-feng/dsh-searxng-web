@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.0] - 2026-09-09
+
+### Changed / 变更
+
+- **DeepSeek Harness 0.1.5-alpha.1 compatibility verified**: Verified on the latest DSH release. Added standard `prepare` build script in `package.json` for seamless source installation.
+- **Documentation Standard Suite**: Added dedicated standalone `CONFIG.md`, `CONFIG.zh.md`, `UPDATE.md`, `UPDATE.zh.md`, `UNINSTALL.md`, and `UNINSTALL.zh.md`.
+- **Package Manifest**: Registered all documentation files into `files` manifest for complete tarball and npm distribution.
+- **兼容性：已在 deepseek-harness 0.1.5-alpha.1 最新发布版上完成全面验证**：添加 `prepare` 构建脚本，支持最新 pnpm 与源码安装机制；新增独立的配置、更新与卸载全套说明文档。
+
 ## [0.5.9] - 2026-09-04
 
 ### Changed / 变更

@@ -31,9 +31,16 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 20
-- DeepSeek Harness `dsh` installed (verified on `0.1.3-alpha.1`, latest release; `0.1.2-rc.1` → `0.1.3-alpha.1` no seam changes)
+- DeepSeek Harness `dsh` installed (verified on `0.1.5-alpha.1`, latest release)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
+
+## Documentation
+
+- [Configuration Guide](CONFIG.md) ([简体中文](CONFIG.zh.md))
+- [Update Guide](UPDATE.md) ([简体中文](UPDATE.zh.md))
+- [Uninstall Guide](UNINSTALL.md) ([简体中文](UNINSTALL.zh.md))
+- [Changelog](CHANGELOG.md)
 
   ```sh
   curl 'http://YOUR_SEARXNG:8080/search?q=test&format=json'
