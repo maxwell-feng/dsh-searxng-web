@@ -18,7 +18,7 @@
 | `ssrfGuard` | `boolean` | `true` | 是否启用内置 SSRF 防护（阻止模型抓取私有 IP、本地回环和链路本地地址）。封闭内网部署可设为 `false`。 |
 | `defaults` | `object` | `{}` | 转发给 SearXNG 的默认参数（语言、安全搜索等）。 |
 | `defaults.language` | `string` | `"all"` | 默认搜索语言代码，例如 `"zh"`, `"en"`, `"zh-CN"`。 |
-| `defaults.safesearch`| `number \| string` | `0` | 安全过滤等级：`0`（关闭）、`1`（温和）、`2`（严格）。 |
+| `defaults.safesearch`| `number / string` | `0` | 安全过滤等级：`0`（关闭）、`1`（温和）、`2`（严格）。 |
 | `defaults.categories`| `string` | `undefined` | 默认限定的搜索分类，例如 `"general"`, `"it"`, `"science"`。 |
 | `defaults.engines` | `string` | `undefined` | 默认限定的搜索引擎列表，逗号分隔，如 `"google,bing"`。 |
 | `defaults.timeRange` | `string` | `undefined` | 默认时间过滤范围：`"day"`, `"week"`, `"month"`, `"year"`。 |

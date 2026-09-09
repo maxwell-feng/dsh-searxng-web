@@ -18,7 +18,7 @@ All options are validated at load time by `@deepseek-ai/schemastery`.
 | `ssrfGuard` | `boolean` | `true` | Refuse private/loopback/link-local destinations during `web_fetch`. Set `false` only in closed networks. |
 | `defaults` | `object` | `{}` | Query defaults passed directly to SearXNG. |
 | `defaults.language` | `string` | `"all"` | Language code, e.g. `"en"`, `"zh-CN"`. |
-| `defaults.safesearch`| `number \| string` | `0` | Safe search filter level: `0` (off), `1` (moderate), `2` (strict). |
+| `defaults.safesearch`| `number / string` | `0` | Safe search filter level: `0` (off), `1` (moderate), `2` (strict). |
 | `defaults.categories`| `string` | `undefined` | Restrict search categories, e.g. `"general"`, `"it"`. |
 | `defaults.engines` | `string` | `undefined` | Comma-separated search engine names, e.g. `"google,bing"`. |
 | `defaults.timeRange` | `string` | `undefined` | Time filter: `"day"`, `"week"`, `"month"`, `"year"`. |
