@@ -1,6 +1,6 @@
 # dsh-searxng-web
 
-English | [简体中文](README.zh-CN.md)
+English | [简体中文](README.zh.md)
 
 [![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com)
 [![npm version](https://img.shields.io/npm/v/dsh-searxng-web)](https://www.npmjs.com/package/dsh-searxng-web)
@@ -30,10 +30,19 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 
 ## Requirements
 
-- Node.js ≥ 20
-- DeepSeek Harness `dsh` installed (verified on `0.1.3-alpha.1`, latest release; `0.1.2-rc.1` → `0.1.3-alpha.1` no seam changes)
+- Node.js ≥ 22
+- DeepSeek Harness `dsh` installed (verified on `0.1.5-rc.1`, latest release)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
+
+## Documentation
+
+- [Installation Guide](INSTALL.md) ([简体中文](INSTALL.zh.md))
+- [Configuration Guide](CONFIG.md) ([简体中文](CONFIG.zh.md))
+- [Usage Guide](USAGE.md) ([简体中文](USAGE.zh.md))
+- [Update Guide](UPDATE.md) ([简体中文](UPDATE.zh.md))
+- [Uninstall Guide](UNINSTALL.md) ([简体中文](UNINSTALL.zh.md))
+- [Changelog](CHANGELOG.md)
 
   ```sh
   curl 'http://YOUR_SEARXNG:8080/search?q=test&format=json'
@@ -55,15 +64,19 @@ or from the repository / a tarball:
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # source checkout
-dsh plugin --profile web add ./dsh-searxng-web-0.5.5.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
 > Git installs fetch sources: the repository commits the compiled `lib/`
-> output, so git installs load without any build step — there is no `prepare`
-> script, so pnpm `allowBuilds` is never needed either.
+> output, so git installs load without waiting on a registry — the
+> `prepare` script (`npm run build`) rebuilds `lib/` from source after
+> install. pnpm refuses to run a git dependency's `prepare` until it is
+> allowlisted; if the first `add` fails, copy the exact package key pnpm
+> printed into the profile's `pnpm-workspace.yaml` and re-run the `add`.
+> See the [Installation Guide](INSTALL.md).
 
 ### Upgrading
 
@@ -86,6 +99,15 @@ rows are unchanged, only the dependency pins move.
 only its version pins in that release, so again no config changes required.
 0.5.5 verifies against `0.1.2-alpha.4` (latest `master`): seam unchanged,
 no config migration.
+0.6.0 adapts to deepseek-harness `0.1.5-alpha.1`: seam unchanged, adds a
+standard `prepare` build script and the standalone
+CONFIG / UPDATE / UNINSTALL doc suite — no config changes required.
+0.7.0 verifies against deepseek-harness `0.1.5-rc.1`: the `ctx.web`
+provider seam (`packages/web/web/src`) is source-identical, vendored
+`@deepseek-ai/cordis` `4.0.2` / `@deepseek-ai/schemastery` `3.18.2`
+unchanged — no code or config migration required. Node floor raised to
+`>=22` (harness floor is `^22.19`). Adds INSTALL / USAGE guides and
+rewrites CONFIG against the actual schema.
 
 Installing does three things (via the bundled patch layer):
 

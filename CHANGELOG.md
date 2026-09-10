@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.7.0] - 2026-09-10
+
+### Changed / 变更
+
+- **DeepSeek Harness 0.1.5-rc.1 compatibility verified**: the `ctx.web` provider seam (`packages/web/web/src`, `registerSearchProvider` / `registerFetchProvider`) is source-identical between `0.1.5-alpha.1` and `0.1.5-rc.1`, and the vendored `@deepseek-ai/cordis` `4.0.2` / `@deepseek-ai/schemastery` `3.18.2` are unchanged — no code or config migration required. The only `tool-web` delta is scope-aware system-prompt text, which this bundle does not consume.
+- **Node floor raised to `>=22`** (`engines`), matching the harness floor (`^22.19.0 || >=24.0.0`).
+- **Documentation refresh**: new standalone `INSTALL.md` / `INSTALL.zh.md` (install via `dsh plugin add` / pnpm per `docs/user/develop/basic/publish.md` semantics) and `USAGE.md` / `USAGE.zh.md` (each tool + params + examples, cross-checked against `src/index.ts` and the rc.1 tool seam); `CONFIG.md` / `CONFIG.zh.md` rewritten against the actual `Config` schema (the old tables documented non-existent `maxResults` / `defaults` keys); `README.zh-CN.md` renamed to `README.zh.md`; all links and the `files` manifest updated.
+- **兼容性：已在 deepseek-harness 0.1.5-rc.1 上完成验证**：`ctx.web` provider 缝（`packages/web/web/src`，`registerSearchProvider` / `registerFetchProvider`）在 `0.1.5-alpha.1` 与 `0.1.5-rc.1` 之间源码完全一致，内置 `@deepseek-ai/cordis` `4.0.2` / `@deepseek-ai/schemastery` `3.18.2` 未变——无需代码或配置迁移。`tool-web` 唯一的差异是 scope 感知的 system-prompt 文案，本 bundle 不消费该缝。
+- **Node 底线升至 `>=22`**（`engines`），与 harness 底线（`^22.19.0 || >=24.0.0`）对齐。
+- **文档刷新**：新增独立 `INSTALL.md` / `INSTALL.zh.md`（按 `docs/user/develop/basic/publish.md` 语义经 `dsh plugin add` / pnpm 安装）与 `USAGE.md` / `USAGE.zh.md`（每个工具的参数与示例，均对照 `src/index.ts` 与 rc.1 工具缝逐项核对）；`CONFIG.md` / `CONFIG.zh.md` 按实际 `Config` schema 重写（旧表格记载了不存在的 `maxResults` / `defaults` 键）；`README.zh-CN.md` 重命名为 `README.zh.md`；所有链接与 `files` 清单一并更新。
+
+## [0.6.0] - 2026-09-09
+
+### Changed / 变更
+
+- **DeepSeek Harness 0.1.5-alpha.1 compatibility verified**: Verified on the latest DSH release. Added standard `prepare` build script in `package.json` for seamless source installation.
+- **Documentation Standard Suite**: Added dedicated standalone `CONFIG.md`, `CONFIG.zh.md`, `UPDATE.md`, `UPDATE.zh.md`, `UNINSTALL.md`, and `UNINSTALL.zh.md`.
+- **Package Manifest**: Registered all documentation files into `files` manifest for complete tarball and npm distribution.
+- **兼容性：已在 deepseek-harness 0.1.5-alpha.1 最新发布版上完成全面验证**：添加 `prepare` 构建脚本，支持最新 pnpm 与源码安装机制；新增独立的配置、更新与卸载全套说明文档。
+
 ## [0.5.9] - 2026-09-04
 
 ### Changed / 变更
