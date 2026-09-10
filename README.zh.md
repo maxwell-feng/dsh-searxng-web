@@ -23,13 +23,15 @@
 
 ## 环境要求
 
-- Node.js ≥ 20
-- 已安装 DeepSeek Harness `dsh`（已在最新版 `0.1.5-alpha.1` 上完成全面验证）
+- Node.js ≥ 22
+- 已安装 DeepSeek Harness `dsh`（已在最新版 `0.1.5-rc.1` 上完成全面验证）
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
 ## 文档导航
 
+- [安装说明文档](INSTALL.zh.md) ([English](INSTALL.md))
 - [配置说明文档](CONFIG.zh.md) ([English](CONFIG.md))
+- [使用说明文档](USAGE.zh.md) ([English](USAGE.md))
 - [更新说明文档](UPDATE.zh.md) ([English](UPDATE.md))
 - [卸载说明文档](UNINSTALL.zh.md) ([English](UNINSTALL.md))
 - [更新日志 (Changelog)](CHANGELOG.md)
@@ -52,14 +54,16 @@ dsh plugin --profile web add dsh-searxng-web
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # 源码目录
-dsh plugin --profile web add ./dsh-searxng-web-0.5.5.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
 ```
 
-> Git 安装拿到的是源码：仓库直接提交了编译好的 `lib/`，git 安装无需任何
-> 构建步骤——包没有 `prepare` 脚本，因此也不需要 pnpm `allowBuilds` 授权。
+> Git 安装拿到的是源码：仓库直接提交了编译好的 `lib/` 产物，git 安装无需等待 registry——`prepare`
+> 脚本（`npm run build`）会在安装后从源码重新构建 `lib/`。pnpm 在明确授权前拒绝执行 git 依赖的
+> `prepare` 脚本；如果首次 `add` 失败，把 pnpm 打印出的包键原样复制到该 profile 的
+> `pnpm-workspace.yaml` 中再重新执行 `add`。详见[安装说明文档](INSTALL.zh.md)。
 
 ### 升级
 
@@ -77,6 +81,11 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 回传)——无需改动任何配置。0.5.3 适配 deepseek-harness `0.1.2-alpha.2`
 ——缝与配置行均无变化,仅依赖版本上移。0.5.4 适配 deepseek-harness
 `0.1.2-alpha.3`——该版本 `packages/web` 仅移动版本号,因此同样无需改动任何配置。0.5.5 在 `0.1.2-alpha.4` 最新 `master` 上验证：缝接口无变更，无需迁移。
+0.6.0 适配 deepseek-harness `0.1.5-alpha.1`：缝接口无变更，新增标准 `prepare` 构建脚本与独立的
+CONFIG / UPDATE / UNINSTALL 文档套件——无需改动任何配置。0.7.0 在 deepseek-harness `0.1.5-rc.1`
+上验证：`ctx.web` provider 缝（`packages/web/web/src`）源码完全一致，内置 `@deepseek-ai/cordis`
+`4.0.2` / `@deepseek-ai/schemastery` `3.18.2` 未变——无需代码或配置迁移。Node 底线升至 `>=22`
+（harness 底线为 `^22.19`）。新增 INSTALL / USAGE 说明，并按实际 schema 重写 CONFIG。
 
 安装时由自带的补丁层完成三件事:
 

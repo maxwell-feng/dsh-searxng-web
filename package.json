@@ -1,6 +1,6 @@
 {
   "name": "dsh-searxng-web",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "dsh plugin: back the native web_search / web_fetch tools with your self-hosted SearXNG instance - keyless, private, no third-party search vendor.",
   "type": "module",
   "main": "./lib/index.js",
@@ -10,9 +10,13 @@
     "tsconfig.json",
     "cordis.patch.yml",
     "README.md",
-    "README.zh-CN.md",
+    "README.zh.md",
     "CONFIG.md",
     "CONFIG.zh.md",
+    "INSTALL.md",
+    "INSTALL.zh.md",
+    "USAGE.md",
+    "USAGE.zh.md",
     "UPDATE.md",
     "UPDATE.zh.md",
     "UNINSTALL.md",
@@ -38,7 +42,7 @@
     "url": "git+https://github.com/maxwell-feng/dsh-searxng-web.git"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

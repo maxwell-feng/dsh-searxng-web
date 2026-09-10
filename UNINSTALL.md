@@ -1,6 +1,6 @@
 # Uninstall Guide
 
-English | [简体中文](UNINSTALL.zh.md)
+English | [中文](UNINSTALL.zh.md)
 
 This document explains how to completely uninstall `dsh-searxng-web` from your DeepSeek Harness profiles.
 
@@ -12,7 +12,7 @@ This document explains how to completely uninstall `dsh-searxng-web` from your D
 dsh plugin --profile web remove dsh-searxng-web
 ```
 
-This uninstalls the npm dependency from the profile and purges the bundle layer.
+This uninstalls the npm dependency from the profile and purges the bundle layer (the `searxng-web` plugin row, the `ctx.web` provider pointers, and the `tool-web` re-enable row).
 
 ---
 
@@ -31,4 +31,9 @@ Remove the patch row from `$DSH_HOME/profiles/<profile>/cordis.patch.yml`:
 
 ## 3. Verification
 
-Start `dsh web` and verify search defaults to the built-in provider without errors.
+```bash
+dsh --profile web --dump-config | grep -A5 searxng
+```
+
+Start `dsh --profile web` and verify search falls back to the base
+composition (DeepSeek search, no fetch provider) without errors.

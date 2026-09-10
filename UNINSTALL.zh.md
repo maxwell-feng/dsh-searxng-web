@@ -1,6 +1,6 @@
-# 卸载说明文档 (Uninstall Guide)
+# 卸载说明文档
 
-[English](UNINSTALL.md) | 简体中文
+[English](UNINSTALL.md) | 中文
 
 本文档指导如何从 DeepSeek Harness 的指定 Profile 中完整卸载 **dsh-searxng-web** 插件及其自定义配置。
 
@@ -12,7 +12,7 @@
 dsh plugin --profile web remove dsh-searxng-web
 ```
 
-该命令将从目标 profile 依赖与激活组合层列表中彻底注销该插件。
+该命令将从目标 profile 移除 npm 依赖并清除 bundle 层（`searxng-web` 插件行、`ctx.web` provider 指向、`tool-web` 重启用行）。
 
 ---
 
@@ -31,8 +31,8 @@ dsh plugin --profile web remove dsh-searxng-web
 
 ## 3. 验证卸载
 
-启动 DeepSeek Harness：
 ```bash
-dsh web
+dsh --profile web --dump-config | grep -A5 searxng
 ```
-`web_search` 将自动恢复使用官方或基础的搜索后端。
+
+启动 `dsh --profile web`，确认 `web_search` 已回落到基础组合（DeepSeek 搜索、无 fetch provider）且无报错。
