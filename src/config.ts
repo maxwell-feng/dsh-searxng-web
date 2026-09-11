@@ -1,5 +1,5 @@
 import Schema from "@deepseek-ai/schemastery";
-import type { SearxngWebConfig } from "./types.js";
+import type { SearxngWebConfig } from "./types.ts";
 
 /**
  * Loader-time configuration schema (docs/user/develop/basic/config).

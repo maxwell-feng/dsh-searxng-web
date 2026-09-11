@@ -64,7 +64,7 @@ or from the repository / a tarball:
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # source checkout
-dsh plugin --profile web add ./dsh-searxng-web-0.9.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-1.0.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -111,8 +111,8 @@ rewrites CONFIG against the actual schema.
 0.8.0 verifies against deepseek-harness `0.1.5-rc.2`: adds `manifestVersion: 1`
 under `package.json.dsh` conforming to `@deepseek-ai/dsh-package-manifest`
 and declares `"engines.dsh": "^0.1.5-rc.2"`.
-0.9.0 refactors the codebase into a modular TypeScript architecture following
-official plugin development guidelines.
+1.0.0 refactors the codebase into pure TypeScript (zero JavaScript tracked),
+running tests natively via Node `--experimental-strip-types`.
 
 Installing does three things (via the bundled patch layer):
 

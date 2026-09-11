@@ -5,14 +5,14 @@
 // self-hosted SearXNG instance instead of a third-party search vendor.
 
 import type { Context } from "@deepseek-ai/cordis";
-import { Config, normalizeBaseUrl } from "./config.js";
-import { SearxngFetchProvider } from "./fetch-provider.js";
-import { SearxngSearchProvider } from "./search-provider.js";
+import { Config, normalizeBaseUrl } from "./config.ts";
+import { SearxngFetchProvider } from "./fetch-provider.ts";
+import { SearxngSearchProvider } from "./search-provider.ts";
 import type {
     PluginContext,
     SearchDefaults,
     SearxngWebConfig,
-} from "./types.js";
+} from "./types.ts";
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = "searxng-web";
@@ -20,12 +20,12 @@ export const name = "searxng-web";
 /** Services required by this plugin; ready before apply() runs. */
 export const inject = ["web"];
 
-export { Config, normalizeBaseUrl } from "./config.js";
-export { htmlToText } from "./html.js";
-export { SearxngSearchProvider } from "./search-provider.js";
-export { SearxngFetchProvider } from "./fetch-provider.js";
-export { isPrivateIp, isPrivateIPv4, isPrivateIPv6, resolveFetchTarget } from "./ssrf.js";
-export * from "./types.js";
+export { Config, normalizeBaseUrl } from "./config.ts";
+export { htmlToText } from "./html.ts";
+export { SearxngSearchProvider } from "./search-provider.ts";
+export { SearxngFetchProvider } from "./fetch-provider.ts";
+export { isPrivateIp, isPrivateIPv4, isPrivateIPv6, resolveFetchTarget } from "./ssrf.ts";
+export * from "./types.ts";
 
 /**
  * Plugin entry point. Configures and registers the search and fetch providers
