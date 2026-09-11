@@ -5,7 +5,7 @@ English | [中文](INSTALL.zh.md)
 ## Requirements
 
 - Node.js `>=22` (the harness floor is `^22.19.0 || >=24.0.0`)
-- DeepSeek Harness `dsh` at `0.1.5-rc.1`
+- DeepSeek Harness `dsh` at `0.1.5-rc.2`
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -36,7 +36,7 @@ dsh plugin --profile web add ./dsh-searxng-web
 ## From a tarball
 
 ```sh
-dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.8.0.tgz
 ```
 
 ## From git

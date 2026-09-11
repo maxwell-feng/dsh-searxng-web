@@ -24,7 +24,7 @@
 ## 环境要求
 
 - Node.js ≥ 22
-- 已安装 DeepSeek Harness `dsh`（已在最新版 `0.1.5-rc.1` 上完成全面验证）
+- 已安装 DeepSeek Harness `dsh`（已在最新版 `0.1.5-rc.2` 上完成全面验证）
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例(`settings.yml` → `search.formats: [html, json]`),用下面的命令验证:
 
 ## 文档导航
@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-searxng-web
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # 源码目录
-dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.8.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -86,6 +86,8 @@ CONFIG / UPDATE / UNINSTALL 文档套件——无需改动任何配置。0.7.0 �
 上验证：`ctx.web` provider 缝（`packages/web/web/src`）源码完全一致，内置 `@deepseek-ai/cordis`
 `4.0.2` / `@deepseek-ai/schemastery` `3.18.2` 未变——无需代码或配置迁移。Node 底线升至 `>=22`
 （harness 底线为 `^22.19`）。新增 INSTALL / USAGE 说明，并按实际 schema 重写 CONFIG。
+0.8.0 适配 deepseek-harness `0.1.5-rc.2`：遵循最新 `@deepseek-ai/dsh-package-manifest`
+规范增加 `manifestVersion: 1` 声明并声明宿主兼容区间 `"dsh": "^0.1.5-rc.2"`。
 
 安装时由自带的补丁层完成三件事:
 

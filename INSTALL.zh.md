@@ -5,7 +5,7 @@
 ## 环境要求
 
 - Node.js `>=22`（harness 的底线是 `^22.19.0 || >=24.0.0`）
-- DeepSeek Harness `dsh`，版本 `0.1.5-rc.1`
+- DeepSeek Harness `dsh`，版本 `0.1.5-rc.2`
 - 一个可访问、且已开启 JSON 输出的 SearXNG 实例（`settings.yml` → `search.formats: [html, json]`），用下面的命令验证：
 
 ```sh
@@ -34,7 +34,7 @@ dsh plugin --profile web add ./dsh-searxng-web
 ## 从 tarball 安装
 
 ```sh
-dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.8.0.tgz
 ```
 
 ## 从 git 安装

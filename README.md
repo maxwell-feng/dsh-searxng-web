@@ -31,7 +31,7 @@ model ── web_fetch ──▶ ctx.web ──▶ searxng-web-fetch ──▶ t
 ## Requirements
 
 - Node.js ≥ 22
-- DeepSeek Harness `dsh` installed (verified on `0.1.5-rc.1`, latest release)
+- DeepSeek Harness `dsh` installed (verified on `0.1.5-rc.2`, latest release)
 - A reachable SearXNG instance with JSON output enabled
   (`settings.yml` → `search.formats: [html, json]`), verified by:
 
@@ -64,7 +64,7 @@ or from the repository / a tarball:
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # source checkout
-dsh plugin --profile web add ./dsh-searxng-web-0.7.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.8.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # or pin a commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -108,6 +108,9 @@ provider seam (`packages/web/web/src`) is source-identical, vendored
 unchanged — no code or config migration required. Node floor raised to
 `>=22` (harness floor is `^22.19`). Adds INSTALL / USAGE guides and
 rewrites CONFIG against the actual schema.
+0.8.0 verifies against deepseek-harness `0.1.5-rc.2`: adds `manifestVersion: 1`
+under `package.json.dsh` conforming to `@deepseek-ai/dsh-package-manifest`
+and declares `"engines.dsh": "^0.1.5-rc.2"`.
 
 Installing does three things (via the bundled patch layer):
 
