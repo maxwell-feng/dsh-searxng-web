@@ -1,4 +1,4 @@
-import { providerError } from "./types.js";
+import { providerError } from "./types.ts";
 
 /** fetch() under BOTH the caller signal and a hard timeout. */
 export async function fetchBounded(

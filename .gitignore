@@ -1,4 +1,8 @@
 node_modules/
+lib/
 *.log
+*.tgz
+*.tsbuildinfo
+.mimosa/
 # npm cache written with a literal %APPDATA% path when the env var is unset
 %APPDATA%/

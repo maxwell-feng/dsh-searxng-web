@@ -16,7 +16,7 @@ dsh plugin --profile web update dsh-searxng-web@latest
 ```
 or pin version:
 ```bash
-dsh plugin --profile web add dsh-searxng-web@0.9.0
+dsh plugin --profile web add dsh-searxng-web@1.0.0
 ```
 
 ### Upgrading via Git Checkout
@@ -32,17 +32,17 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 
 ### Upgrading via Tarball
 ```bash
-dsh plugin --profile web add ./dsh-searxng-web-0.9.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-1.0.0.tgz
 ```
 
 ---
 
 ## 2. Version Notes
 
-- **0.9.0** refactors the plugin codebase into modular TypeScript components
-  (`types.ts`, `config.ts`, `ssrf.ts`, `html.ts`, `http.ts`, `search-provider.ts`,
-  `fetch-provider.ts`, `index.ts`), strictly following the official harness plugin
-  development guidelines.
+- **1.0.0** refactors the plugin codebase into pure TypeScript (zero JavaScript tracked),
+  migrating tests to `test/standalone-test.test.ts` under Node `--experimental-strip-types`,
+  modularizing responsibilities into `types.ts`, `config.ts`, `ssrf.ts`, `html.ts`, `http.ts`,
+  `search-provider.ts`, and `fetch-provider.ts`.
 - **0.8.0** targets harness `0.1.5-rc.2`, adds `manifestVersion: 1` under
   `package.json.dsh` conforming to `@deepseek-ai/dsh-package-manifest`,
   and declares host requirement `"dsh": "^0.1.5-rc.2"`.

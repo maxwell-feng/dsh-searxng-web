@@ -36,7 +36,7 @@ dsh plugin --profile web add ./dsh-searxng-web
 ## From a tarball
 
 ```sh
-dsh plugin --profile web add ./dsh-searxng-web-0.9.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-1.0.0.tgz
 ```
 
 ## From git

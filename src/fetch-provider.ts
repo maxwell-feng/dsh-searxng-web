@@ -1,11 +1,11 @@
-import { htmlToText } from "./html.js";
-import { fetchBounded } from "./http.js";
-import { resolveFetchTarget } from "./ssrf.js";
+import { htmlToText } from "./html.ts";
+import { fetchBounded } from "./http.ts";
+import { resolveFetchTarget } from "./ssrf.ts";
 import {
     providerError,
     type FetchOutcome,
     type WebFetchProvider,
-} from "./types.js";
+} from "./types.ts";
 
 const FETCH_PROVIDER_ID = "searxng-web-fetch";
 

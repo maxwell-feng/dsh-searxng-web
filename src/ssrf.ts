@@ -1,6 +1,6 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
-import { providerError } from "./types.js";
+import { providerError } from "./types.ts";
 
 /** Check if an IPv4 address is in loopback, private, link-local, or reserved ranges. */
 export function isPrivateIPv4(ip: string): boolean {

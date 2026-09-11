@@ -1,11 +1,11 @@
-import { fetchBounded } from "./http.js";
+import { fetchBounded } from "./http.ts";
 import {
     providerError,
     type SearchDefaults,
     type SearchOutcome,
     type Source,
     type WebSearchProvider,
-} from "./types.js";
+} from "./types.ts";
 
 const SEARCH_PROVIDER_ID = "searxng-web";
 const MAX_RESULTS_CAP = 50;

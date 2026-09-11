@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-searxng-web
 
 ```sh
 dsh plugin --profile web add ./dsh-searxng-web        # 源码目录
-dsh plugin --profile web add ./dsh-searxng-web-0.9.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-1.0.0.tgz
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 # 或锁定 commit:
 dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web#<sha>
@@ -87,7 +87,7 @@ CONFIG / UPDATE / UNINSTALL 文档套件——无需改动任何配置。0.7.0 �
 `4.0.2` / `@deepseek-ai/schemastery` `3.18.2` 未变——无需代码或配置迁移。Node 底线升至 `>=22`
 （harness 底线为 `^22.19`）。新增 INSTALL / USAGE 说明，并按实际 schema 重写 CONFIG。
 0.8.0 适配 deepseek-harness `0.1.5-rc.2`：遵循最新 `@deepseek-ai/dsh-package-manifest`
-规范增加 `manifestVersion: 1` 声明并声明宿主兼容区间 `"dsh": "^0.1.5-rc.2"`。0.9.0 按照官方开发规范全面重构为模块化 TypeScript 架构，强化 SSRF 防护。
+规范增加 `manifestVersion: 1` 声明并声明宿主兼容区间 `"dsh": "^0.1.5-rc.2"`。1.0.0 采用纯 TypeScript 架构（零 JavaScript 残留），测试由 Node `--experimental-strip-types` 原生运行。
 
 安装时由自带的补丁层完成三件事:
 
