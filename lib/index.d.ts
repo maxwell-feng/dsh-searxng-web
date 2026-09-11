@@ -1,86 +1,17 @@
 import type { Context } from "@deepseek-ai/cordis";
-import Schema from "@deepseek-ai/schemastery";
+import type { SearxngWebConfig } from "./types.js";
 /** Cordis plugin name used by loader diagnostics. */
 export declare const name = "searxng-web";
 /** Services required by this plugin; ready before apply() runs. */
 export declare const inject: string[];
-export interface SearchDefaults {
-    language?: string;
-    safesearch?: number | string;
-    categories?: string;
-    engines?: string;
-    timeRange?: string;
-}
-export interface BasicAuthConfig {
-    username?: string;
-    password?: string;
-}
-export interface SearxngWebConfig {
-    /** SearXNG instance base URL. Default: http://127.0.0.1:8080 */
-    baseUrl?: string;
-    /**
-     * Ordered SearXNG endpoints with automatic failover. When non-empty this
-     * list takes precedence over `baseUrl`. Attempts always start at the last
-     * endpoint that succeeded (sticky) and walk the rest of the list once;
-     * only network-level failures (connection refused / unreachable / timeout /
-     * DNS) trigger a switch — an HTTP answer from any door proves that door is
-     * alive and its status is surfaced as-is without failover.
-     *
-     * Typical triple-stack deployment for a home instance:
-     * `[public-IPv4, public-IPv6, LAN-IPv4]`.
-     */
-    baseUrls?: string[];
-    /** Per-search attempt budget, ms. Default 15000. */
-    timeoutMs?: number;
-    /** Per-fetch attempt budget, ms. Default 30000. */
-    fetchTimeoutMs?: number;
-    /** Cap on characters returned by web_fetch. Default 200000. */
-    fetchMaxChars?: number;
-    /** Refuse private/loopback fetch targets. Default true. */
-    ssrfGuard?: boolean;
-    /**
-     * Extra HTTP headers attached to every request sent TO the SearXNG
-     * instance (search API calls). Never applied to web_fetch targets —
-     * those are model-chosen third-party pages and must stay credential-free.
-     * Use for header-based gates, e.g. `{ "X-API-Key": "..." }`.
-     */
-    headers?: Record<string, string>;
-    /**
-     * Basic-auth credentials for instances behind an authenticating reverse
-     * proxy (caddy basic_auth, nginx auth_basic). Sets the Authorization
-     * header on SearXNG requests. Conflicts with a user-supplied
-     * `headers.Authorization` fail at load time.
-     */
-    basicAuth?: BasicAuthConfig;
-    /** SearXNG query defaults forwarded on every search. */
-    search?: SearchDefaults;
-}
+export { Config, normalizeBaseUrl } from "./config.js";
+export { htmlToText } from "./html.js";
+export { SearxngSearchProvider } from "./search-provider.js";
+export { SearxngFetchProvider } from "./fetch-provider.js";
+export { isPrivateIp, isPrivateIPv4, isPrivateIPv6, resolveFetchTarget } from "./ssrf.js";
+export * from "./types.js";
 /**
- * Loader-time configuration schema (docs/user/develop/basic/config).
- * Defaults mirror apply()'s defensive fallbacks so behavior is identical
- * whether the value comes from the schema or from direct callers.
+ * Plugin entry point. Configures and registers the search and fetch providers
+ * on the `ctx.web` service seam.
  */
-export declare const Config: Schema<SearxngWebConfig>;
-export interface Source {
-    url: string;
-    title?: string;
-    snippet?: string;
-    publishedAt?: string;
-}
-export interface SearchOutcome {
-    sources: Source[];
-    truncated: boolean;
-    content?: string;
-}
-export interface FetchOutcome {
-    url: string;
-    statusCode: number;
-    body: {
-        kind: "text";
-        content: string;
-    };
-    truncated: boolean;
-}
-/** Reduce HTML to readable text: drop script/style/comments/tags, decode entities, squash whitespace. */
-export declare function htmlToText(html: string): string;
 export declare function apply(ctx: Context, config?: Partial<SearxngWebConfig>): void;

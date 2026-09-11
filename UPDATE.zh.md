@@ -17,7 +17,7 @@ dsh plugin --profile web update dsh-searxng-web@latest
 
 或安装指定版本：
 ```bash
-dsh plugin --profile web add dsh-searxng-web@0.8.0
+dsh plugin --profile web add dsh-searxng-web@0.9.0
 ```
 
 ### 从 Git 仓库升级
@@ -34,13 +34,14 @@ dsh plugin --profile web add github:maxwell-feng/dsh-searxng-web
 
 ### 从 Tarball 离线包升级
 ```bash
-dsh plugin --profile web add ./dsh-searxng-web-0.8.0.tgz
+dsh plugin --profile web add ./dsh-searxng-web-0.9.0.tgz
 ```
 
 ---
 
 ## 2. 版本说明
 
+- **0.9.0** 按照官方插件开发规范将代码全面重构为模块化 TypeScript 架构（独立拆分为 `types.ts`、`config.ts`、`ssrf.ts`、`html.ts`、`http.ts`、`search-provider.ts`、`fetch-provider.ts` 与 `index.ts`），并对 SSRF 校验与异常处理进行深度强化。
 - **0.8.0** 适配 harness `0.1.5-rc.2`，遵循最新 `@deepseek-ai/dsh-package-manifest` 规范增加 `manifestVersion: 1` 声明并声明宿主兼容区间 `"dsh": "^0.1.5-rc.2"`。
 - **0.7.0** 适配 harness `0.1.5-rc.1`，Node 底线升至 `>=22`。无需改动任何配置：所有字段默认值不变，单 `baseUrl` 用法完全不受影响。从 0.3.0 起配置会在加载时校验（Schemastery schema），写错的键会让启动直接报出可定位的错误，不再被静默忽略。
 - **0.4.0** 新增可选的 `baseUrls` 粘性故障转移列表；单 `baseUrl` 用法完全不受影响。
