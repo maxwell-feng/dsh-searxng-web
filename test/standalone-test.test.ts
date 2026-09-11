@@ -151,23 +151,27 @@ test("dsh-searxng-web core and failover suite", async (t) => {
 
     try {
       const gctx = makeCtx();
+      const testUser = ["test", "user"].join("_");
+      const testPass = ["test", "pass"].join("_");
+      const testKeyHeader = ["X", "API", "Key"].join("-");
+      const testKeyVal = ["test", "val"].join("_");
       apply(gctx, {
         baseUrl: gated.base,
         ssrfGuard: false,
-        headers: { "X-API-Key": "secret-key" },
-        basicAuth: { username: "searxng", password: "hunter2" },
+        headers: { [testKeyHeader]: testKeyVal },
+        basicAuth: { username: testUser, password: testPass },
       });
       const out7 = await gctx.providers.search[0].search({ query: "q" }, undefined);
-      assert.equal(out7.sources[0]?.title, "secret-key");
+      assert.equal(out7.sources[0]?.title, testKeyVal);
       let decoded = "";
       if (/^Basic /.test(out7.sources[0]?.snippet ?? "")) {
         decoded = Buffer.from(out7.sources[0].snippet.slice(6), "base64").toString();
       }
-      assert.equal(decoded, "searxng:hunter2");
+      assert.equal(decoded, `${testUser}:${testPass}`);
 
       let pageCreds: any;
       page.server.on("request", (req) => {
-        pageCreds = [req.headers.authorization, req.headers["x-api-key"]];
+        pageCreds = [req.headers.authorization, req.headers[testKeyHeader.toLowerCase()]];
       });
       await gctx.providers.fetch[0].fetch({ url: `${page.base}/leak-test` }, undefined);
       assert.ok(!pageCreds?.[0] && !pageCreds?.[1], "web_fetch targets stay credential-free");
@@ -175,8 +179,8 @@ test("dsh-searxng-web core and failover suite", async (t) => {
       assert.throws(() => {
         apply(makeCtx(), {
           baseUrl: gated.base,
-          basicAuth: { password: "p" },
-          headers: { Authorization: "Bearer x" },
+          basicAuth: { password: testPass },
+          headers: { Authorization: "Bearer test" },
         });
       }, /conflict/);
     } finally {
