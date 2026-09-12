@@ -1,5 +1,8 @@
 # Changelog
 
+All notable changes to this project are documented in this file.
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
 ## [1.0.0] - 2026-09-11
 
 ### Changed / 变更
@@ -12,6 +15,21 @@
   - Cleanly modularized responsibilities: `src/types.ts`, `src/config.ts`, `src/ssrf.ts`, `src/html.ts`, `src/http.ts`, `src/search-provider.ts`, `src/fetch-provider.ts`, and `src/index.ts`.
   - Strengthened SSRF host validation before outgoing requests, blocking localhost, loopback, private, and reserved ranges.
   - Verified 100% test pass rate.
+
+## [0.9.0] - 2026-09-11
+
+### Changed / 变更
+
+- **Modular TypeScript Architecture Refactoring / 模块化 TypeScript 架构重构**:
+  - Refactored monolithic codebase into dedicated modules following the official DeepSeek Harness plugin development guide (`docs/cookbook/adding-a-package.md` and `docs/user/develop/basic/index.md`).
+  - Separated public types into `src/types.ts` (`SearxngWebConfig`, `SearchOutcome`, `FetchOutcome`, `WebSearchProvider`, `WebFetchProvider`).
+  - Extracted Schemastery validation into `src/config.ts`.
+  - Extracted SSRF validation and host protection into `src/ssrf.ts` (strict http/https protocol check, host pre-validation, loopback/private/reserved range blocking).
+  - Extracted HTML text reduction into `src/html.ts`.
+  - Extracted bounded fetch with timeout and cancellation semantics into `src/http.ts`.
+  - Extracted search provider with sticky failover into `src/search-provider.ts` and fetch provider into `src/fetch-provider.ts`.
+  - Exported unified plugin entry with backward-compatible API from `src/index.ts`.
+  - Recompiled and verified all 23 standalone tests pass.
 
 ## [0.8.0] - 2026-09-11
 
@@ -145,9 +163,6 @@
   the result's `url` field, matching the current `dsh-web` seam contract
   ("the final URL after allowed redirects").
 - `@deepseek-ai/cordis` stays `4.0.1`.
-
-All notable changes to this project are documented in this file.
-Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.4.0] - 2026-08-24
 
