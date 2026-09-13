@@ -16,7 +16,7 @@ dsh plugin --profile web update dsh-searxng-web@latest
 ```
 or pin version:
 ```bash
-dsh plugin --profile web add dsh-searxng-web@1.0.0
+dsh plugin --profile web add dsh-searxng-web@1.0.1
 ```
 
 ### Upgrading via Git Checkout
