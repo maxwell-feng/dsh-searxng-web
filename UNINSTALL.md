@@ -2,6 +2,8 @@
 
 English | [中文](UNINSTALL.zh.md)
 
+> Verified against DeepSeek Harness **0.1.5-rc.2** with `dsh-searxng-web` **1.0.1**.
+
 This document explains how to completely uninstall `dsh-searxng-web` from your DeepSeek Harness profiles.
 
 ---

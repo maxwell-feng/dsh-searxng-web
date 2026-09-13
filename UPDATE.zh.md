@@ -17,7 +17,7 @@ dsh plugin --profile web update dsh-searxng-web@latest
 
 或安装指定版本：
 ```bash
-dsh plugin --profile web add dsh-searxng-web@1.0.0
+dsh plugin --profile web add dsh-searxng-web@1.0.1
 ```
 
 ### 从 Git 仓库升级

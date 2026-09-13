@@ -2,6 +2,8 @@
 
 [English](CONFIG.md) | 中文
 
+> 已在 DeepSeek Harness **0.1.5-rc.2** 上随 `dsh-searxng-web` **1.0.1** 完成全面验证。
+
 所有配置项位于 `cordis.patch.yml`（profile、home 或 `--patch`
 覆盖层）的 `searxng-web` 行上，由 `src/index.ts` 中的 Schemastery
 `Config` schema 在加载时校验。以下默认值与 schema 及 `apply()`

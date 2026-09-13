@@ -2,6 +2,8 @@
 
 English | [中文](CONFIG.zh.md)
 
+> Verified against DeepSeek Harness **0.1.5-rc.2** with `dsh-searxng-web` **1.0.1**.
+
 All options live on the `searxng-web` row of a `cordis.patch.yml`
 (profile, home, or `--patch` overlay) and are validated at load time by
 the Schemastery `Config` schema in `src/index.ts`. Defaults below are

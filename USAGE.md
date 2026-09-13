@@ -2,6 +2,8 @@
 
 English | [中文](USAGE.zh.md)
 
+> Verified against DeepSeek Harness **0.1.5-rc.2** with `dsh-searxng-web` **1.0.1**.
+
 The model keeps using the short native tool names — no tool-name
 changes. Both tools below are available in every agent and subagent
 once the bundle is installed.

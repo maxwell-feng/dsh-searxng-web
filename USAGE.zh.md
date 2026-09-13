@@ -2,6 +2,8 @@
 
 [English](USAGE.md) | 中文
 
+> 已在 DeepSeek Harness **0.1.5-rc.2** 上随 `dsh-searxng-web` **1.0.1** 完成全面验证。
+
 模型继续使用短的原生工具名——无需改动任何工具名。安装 bundle 后，
 以下两个工具在每个 agent 与 subagent 中自动可用。
 
